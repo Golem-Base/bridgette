@@ -39,7 +39,12 @@ func Migrate(db *sql.DB) error {
 	}
 
 	err = m.Up()
-	if err != nil {
+	switch err {
+	case nil:
+		return nil
+	case migrate.ErrNoChange:
+		return nil
+	default:
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 

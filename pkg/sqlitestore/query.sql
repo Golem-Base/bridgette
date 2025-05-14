@@ -17,4 +17,11 @@ INSERT INTO l1_standard_bridge_eth_deposit_initiated (
     ?,
     ?,
     ?
-)
+);
+
+-- name: GetBlockPointer :one
+SELECT block_number FROM BLOCK_POINTERS WHERE name = ? LIMIT 1;
+
+-- name: UpdateBlockPointer :exec
+UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ?;
+

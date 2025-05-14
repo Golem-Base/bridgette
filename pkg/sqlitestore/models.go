@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+type BLOCKPOINTER struct {
+	Name        string
+	BlockNumber *int64
+}
+
 type L1StandardBridgeEthDepositInitiated struct {
 	ID                                        int64
 	CreatedAt                                 *time.Time

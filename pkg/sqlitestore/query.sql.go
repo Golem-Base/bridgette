@@ -9,6 +9,17 @@ import (
 	"context"
 )
 
+const getBlockPointer = `-- name: GetBlockPointer :one
+SELECT block_number FROM BLOCK_POINTERS WHERE name = ? LIMIT 1
+`
+
+func (q *Queries) GetBlockPointer(ctx context.Context, name string) (*int64, error) {
+	row := q.queryRow(ctx, q.getBlockPointerStmt, getBlockPointer, name)
+	var block_number *int64
+	err := row.Scan(&block_number)
+	return block_number, err
+}
+
 const insertL1StandardBridgeETHDepositInitiated = `-- name: InsertL1StandardBridgeETHDepositInitiated :exec
 INSERT INTO l1_standard_bridge_eth_deposit_initiated (
     block_number,
@@ -43,7 +54,7 @@ type InsertL1StandardBridgeETHDepositInitiatedParams struct {
 }
 
 func (q *Queries) InsertL1StandardBridgeETHDepositInitiated(ctx context.Context, arg InsertL1StandardBridgeETHDepositInitiatedParams) error {
-	_, err := q.db.ExecContext(ctx, insertL1StandardBridgeETHDepositInitiated,
+	_, err := q.exec(ctx, q.insertL1StandardBridgeETHDepositInitiatedStmt, insertL1StandardBridgeETHDepositInitiated,
 		arg.BlockNumber,
 		arg.BlockTimestamp,
 		arg.TxHash,
@@ -53,5 +64,19 @@ func (q *Queries) InsertL1StandardBridgeETHDepositInitiated(ctx context.Context,
 		arg.Event,
 		arg.MatchingHash,
 	)
+	return err
+}
+
+const updateBlockPointer = `-- name: UpdateBlockPointer :exec
+UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ?
+`
+
+type UpdateBlockPointerParams struct {
+	BlockNumber *int64
+	Name        string
+}
+
+func (q *Queries) UpdateBlockPointer(ctx context.Context, arg UpdateBlockPointerParams) error {
+	_, err := q.exec(ctx, q.updateBlockPointerStmt, updateBlockPointer, arg.BlockNumber, arg.Name)
 	return err
 }

@@ -33,6 +33,11 @@ var l2StandardBridgeAddress = common.HexToAddress("0x420000000000000000000000000
 // DepositFinalized (index_topic_1 address l1Token, index_topic_2 address l2Token, index_topic_3 address from, address to, uint256 amount, bytes extraData)
 var ethDepositFinalizedEvent = common.HexToHash("0xb0444523268717a02698be47d0803aa7468c00acbed2f8bd93a0459cde61dd89")
 
+const L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK = "l1_standard_bridge_eth_deposit_initiated_lowest_processed_block"
+const L1_ETH_DEPOSIT_INITIATED_LAST_BLOCK = "l1_standard_bridge_eth_deposit_initiated_last_processed_block"
+const L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK = "l2_standard_bridge_eth_deposit_finalized_lowest_processed_block"
+const L2_ETH_DEPOSIT_FINALIZED_LAST_BLOCK = "l2_standard_bridge_eth_deposit_finalized_last_processed_block"
+
 func main() {
 
 	log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -143,6 +148,8 @@ func main() {
 			// 	}
 			// }()
 
+			autocommitStore := sqlitestore.New(db)
+
 			eg, egCtx := errgroup.WithContext(ctx)
 
 			eg.Go(func() error {
@@ -154,6 +161,15 @@ func main() {
 				fromBlock, err := l1Client.BlockNumber(egCtx)
 				if err != nil {
 					return fmt.Errorf("failed to get current block number: %w", err)
+				}
+
+				lowestProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK)
+				if err != nil {
+					return fmt.Errorf("failed to get lowest processed block: %w", err)
+				}
+
+				if lowestProcessedBlock != nil {
+					fromBlock = uint64(*lowestProcessedBlock)
 				}
 
 				for fromBlock > 0 {
@@ -231,9 +247,18 @@ func main() {
 
 					if len(logs) == 0 {
 						log.Info("no logs found", "from_block", fromBlock)
-						break
 					} else {
 						log.Info("got logs", "from_block", fromBlock, "count", len(logs))
+					}
+
+					blockNumber := int64(fromBlock)
+
+					err = autocommitStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
+						Name:        L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK,
+						BlockNumber: &blockNumber,
+					})
+					if err != nil {
+						return fmt.Errorf("failed to update block pointer: %w", err)
 					}
 
 				}
@@ -250,6 +275,15 @@ func main() {
 				fromBlock, err := l2Client.BlockNumber(egCtx)
 				if err != nil {
 					return fmt.Errorf("failed to get current block number: %w", err)
+				}
+
+				lowestProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK)
+				if err != nil {
+					return fmt.Errorf("failed to get lowest processed block: %w", err)
+				}
+
+				if lowestProcessedBlock != nil {
+					fromBlock = uint64(*lowestProcessedBlock)
 				}
 
 				for fromBlock > 0 {
@@ -298,6 +332,16 @@ func main() {
 						log.Info("no logs found", "from_block", fromBlock)
 					} else {
 						log.Info("got logs", "from_block", fromBlock, "count", len(logs))
+					}
+
+					blockNumber := int64(fromBlock)
+
+					err = autocommitStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
+						Name:        L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK,
+						BlockNumber: &blockNumber,
+					})
+					if err != nil {
+						return fmt.Errorf("failed to update block pointer: %w", err)
 					}
 
 				}
