@@ -25,3 +25,26 @@ SELECT block_number FROM BLOCK_POINTERS WHERE name = ? LIMIT 1;
 -- name: UpdateBlockPointer :exec
 UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ?;
 
+-- name: InsertL2StandardBridgeDepositFinalized :exec
+INSERT INTO l2_standard_bridge_deposit_finalized (
+    block_number,
+    block_timestamp,
+    tx_hash,
+    from_address,
+    to_address,
+    l1_token,
+    amount,
+    event,
+    matching_hash
+) VALUES (
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?
+);
+

@@ -2,13 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"math/big"
 	"os"
 	"os/signal"
-	"path/filepath"
+	"time"
 
 	"github.com/Golem-Base/bridgette/pkg/sqlitestore"
 	"github.com/ethereum/go-ethereum"
@@ -156,14 +155,12 @@ func main() {
 
 				log := log.With("chain", "l1")
 
-				l1OutpuPath := filepath.Join("output", "l1")
-
 				fromBlock, err := l1Client.BlockNumber(egCtx)
 				if err != nil {
 					return fmt.Errorf("failed to get current block number: %w", err)
 				}
 
-				lowestProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK)
+				lowestProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK)
 				if err != nil {
 					return fmt.Errorf("failed to get lowest processed block: %w", err)
 				}
@@ -173,6 +170,20 @@ func main() {
 				}
 
 				for fromBlock > 0 {
+					// Start a transaction at the beginning of each loop iteration
+					tx, err := db.Begin()
+					if err != nil {
+						return fmt.Errorf("failed to begin transaction: %w", err)
+					}
+					// Create a transaction-wrapped store
+					txStore := sqlitestore.New(tx).WithTx(tx)
+
+					defer func() {
+						// If we exit with error, ensure we roll back the transaction
+						if err != nil {
+							tx.Rollback()
+						}
+					}()
 
 					toBlock := fromBlock - 1
 
@@ -191,59 +202,27 @@ func main() {
 						ToBlock:   big.NewInt(int64(toBlock)),
 					})
 					if err != nil {
+						tx.Rollback()
 						return fmt.Errorf("failed to filter logs: %w", err)
 					}
 
 					for _, log := range logs {
-						fileName := filepath.Join(l1OutpuPath, fmt.Sprintf("%018d-%04d-%04d.json", log.BlockNumber, log.TxIndex, log.Index))
-
-						file, err := os.Create(fileName)
+						// Insert log data into database instead of file
+						err = txStore.InsertL1StandardBridgeETHDepositInitiated(egCtx, sqlitestore.InsertL1StandardBridgeETHDepositInitiatedParams{
+							BlockNumber:    int64(log.BlockNumber),
+							BlockTimestamp: int64(time.Now().Unix()), // Consider fetching actual block timestamp
+							TxHash:         log.TxHash.Bytes(),
+							FromAddress:    log.Address.Bytes(),
+							ToAddress:      log.Address.Bytes(), // Extract the actual to address from event data if available
+							Amount:         0,                   // Extract amount from event data if available
+							Event:          log.Data,
+							MatchingHash:   log.TxHash.Bytes(), // Use appropriate hash for matching
+						})
 						if err != nil {
-							return fmt.Errorf("failed to create file: %w", err)
+							tx.Rollback()
+							return fmt.Errorf("failed to insert log: %w", err)
 						}
-
-						err = json.NewEncoder(file).Encode(log)
-						if err != nil {
-							return fmt.Errorf("failed to encode log: %w", err)
-						}
-
-						err = file.Close()
-						if err != nil {
-							return fmt.Errorf("failed to close file: %w", err)
-						}
-
 					}
-
-					// transactionsHashes := map[common.Hash]bool{}
-
-					// for _, log := range logs {
-					// 	transactionsHashes[log.TxHash] = true
-					// }
-
-					// for txHash := range transactionsHashes {
-					// 	receipt, err := l1Client.TransactionReceipt(egCtx, txHash)
-					// 	if err != nil {
-					// 		return fmt.Errorf("failed to get transaction receipt: %w", err)
-					// 	}
-
-					// 	fileName := filepath.Join(l1OutpuPath, fmt.Sprintf("%018d-%04d.json", receipt.BlockNumber.Uint64(), receipt.TransactionIndex))
-
-					// 	file, err := os.Create(fileName)
-					// 	if err != nil {
-					// 		return fmt.Errorf("failed to create file: %w", err)
-					// 	}
-
-					// 	err = json.NewEncoder(file).Encode(receipt)
-					// 	if err != nil {
-					// 		return fmt.Errorf("failed to encode receipt: %w", err)
-					// 	}
-
-					// 	err = file.Close()
-					// 	if err != nil {
-					// 		return fmt.Errorf("failed to close file: %w", err)
-					// 	}
-
-					// }
 
 					if len(logs) == 0 {
 						log.Info("no logs found", "from_block", fromBlock)
@@ -253,14 +232,20 @@ func main() {
 
 					blockNumber := int64(fromBlock)
 
-					err = autocommitStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
+					err = txStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
 						Name:        L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK,
 						BlockNumber: &blockNumber,
 					})
 					if err != nil {
+						tx.Rollback()
 						return fmt.Errorf("failed to update block pointer: %w", err)
 					}
 
+					// Commit the transaction
+					err = tx.Commit()
+					if err != nil {
+						return fmt.Errorf("failed to commit transaction: %w", err)
+					}
 				}
 
 				return nil
@@ -269,8 +254,6 @@ func main() {
 			eg.Go(func() error {
 
 				log := log.With("chain", "l2")
-
-				l2OutpuPath := filepath.Join("output", "l2")
 
 				fromBlock, err := l2Client.BlockNumber(egCtx)
 				if err != nil {
@@ -287,6 +270,20 @@ func main() {
 				}
 
 				for fromBlock > 0 {
+					// Start a transaction at the beginning of each loop iteration
+					tx, err := db.Begin()
+					if err != nil {
+						return fmt.Errorf("failed to begin transaction: %w", err)
+					}
+					// Create a transaction-wrapped store
+					txStore := sqlitestore.New(tx).WithTx(tx)
+
+					defer func() {
+						// If we exit with error, ensure we roll back the transaction
+						if err != nil {
+							tx.Rollback()
+						}
+					}()
 
 					toBlock := fromBlock - 1
 
@@ -305,27 +302,27 @@ func main() {
 						ToBlock:   big.NewInt(int64(toBlock)),
 					})
 					if err != nil {
+						tx.Rollback()
 						return fmt.Errorf("failed to filter logs: %w", err)
 					}
 
 					for _, log := range logs {
-						fileName := filepath.Join(l2OutpuPath, fmt.Sprintf("%018d-%04d-%04d.json", log.BlockNumber, log.TxIndex, log.Index))
-
-						file, err := os.Create(fileName)
+						// Insert log data into database instead of file
+						err = txStore.InsertL2StandardBridgeDepositFinalized(egCtx, sqlitestore.InsertL2StandardBridgeDepositFinalizedParams{
+							BlockNumber:    int64(log.BlockNumber),
+							BlockTimestamp: int64(time.Now().Unix()), // Consider fetching actual block timestamp
+							TxHash:         log.TxHash.Bytes(),
+							FromAddress:    log.Address.Bytes(),
+							ToAddress:      log.Address.Bytes(), // Extract the actual to address from event data if available
+							L1Token:        log.Address.Bytes(), // Extract the L1 token address from event data if available
+							Amount:         0,                   // Extract amount from event data if available
+							Event:          log.Data,
+							MatchingHash:   log.TxHash.Bytes(), // Use appropriate hash for matching
+						})
 						if err != nil {
-							return fmt.Errorf("failed to create file: %w", err)
+							tx.Rollback()
+							return fmt.Errorf("failed to insert log: %w", err)
 						}
-
-						err = json.NewEncoder(file).Encode(log)
-						if err != nil {
-							return fmt.Errorf("failed to encode log: %w", err)
-						}
-
-						err = file.Close()
-						if err != nil {
-							return fmt.Errorf("failed to close file: %w", err)
-						}
-
 					}
 
 					if len(logs) == 0 {
@@ -336,14 +333,20 @@ func main() {
 
 					blockNumber := int64(fromBlock)
 
-					err = autocommitStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
+					err = txStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
 						Name:        L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK,
 						BlockNumber: &blockNumber,
 					})
 					if err != nil {
+						tx.Rollback()
 						return fmt.Errorf("failed to update block pointer: %w", err)
 					}
 
+					// Commit the transaction
+					err = tx.Commit()
+					if err != nil {
+						return fmt.Errorf("failed to commit transaction: %w", err)
+					}
 				}
 
 				return nil

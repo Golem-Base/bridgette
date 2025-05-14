@@ -30,6 +30,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.insertL1StandardBridgeETHDepositInitiatedStmt, err = db.PrepareContext(ctx, insertL1StandardBridgeETHDepositInitiated); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertL1StandardBridgeETHDepositInitiated: %w", err)
 	}
+	if q.insertL2StandardBridgeDepositFinalizedStmt, err = db.PrepareContext(ctx, insertL2StandardBridgeDepositFinalized); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertL2StandardBridgeDepositFinalized: %w", err)
+	}
 	if q.updateBlockPointerStmt, err = db.PrepareContext(ctx, updateBlockPointer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateBlockPointer: %w", err)
 	}
@@ -46,6 +49,11 @@ func (q *Queries) Close() error {
 	if q.insertL1StandardBridgeETHDepositInitiatedStmt != nil {
 		if cerr := q.insertL1StandardBridgeETHDepositInitiatedStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertL1StandardBridgeETHDepositInitiatedStmt: %w", cerr)
+		}
+	}
+	if q.insertL2StandardBridgeDepositFinalizedStmt != nil {
+		if cerr := q.insertL2StandardBridgeDepositFinalizedStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertL2StandardBridgeDepositFinalizedStmt: %w", cerr)
 		}
 	}
 	if q.updateBlockPointerStmt != nil {
@@ -94,6 +102,7 @@ type Queries struct {
 	tx                                            *sql.Tx
 	getBlockPointerStmt                           *sql.Stmt
 	insertL1StandardBridgeETHDepositInitiatedStmt *sql.Stmt
+	insertL2StandardBridgeDepositFinalizedStmt    *sql.Stmt
 	updateBlockPointerStmt                        *sql.Stmt
 }
 
@@ -103,6 +112,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                  tx,
 		getBlockPointerStmt: q.getBlockPointerStmt,
 		insertL1StandardBridgeETHDepositInitiatedStmt: q.insertL1StandardBridgeETHDepositInitiatedStmt,
+		insertL2StandardBridgeDepositFinalizedStmt:    q.insertL2StandardBridgeDepositFinalizedStmt,
 		updateBlockPointerStmt:                        q.updateBlockPointerStmt,
 	}
 }

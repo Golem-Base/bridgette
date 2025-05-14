@@ -67,6 +67,57 @@ func (q *Queries) InsertL1StandardBridgeETHDepositInitiated(ctx context.Context,
 	return err
 }
 
+const insertL2StandardBridgeDepositFinalized = `-- name: InsertL2StandardBridgeDepositFinalized :exec
+INSERT INTO l2_standard_bridge_deposit_finalized (
+    block_number,
+    block_timestamp,
+    tx_hash,
+    from_address,
+    to_address,
+    l1_token,
+    amount,
+    event,
+    matching_hash
+) VALUES (
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?
+)
+`
+
+type InsertL2StandardBridgeDepositFinalizedParams struct {
+	BlockNumber    int64
+	BlockTimestamp int64
+	TxHash         []byte
+	FromAddress    []byte
+	ToAddress      []byte
+	L1Token        []byte
+	Amount         float64
+	Event          []byte
+	MatchingHash   []byte
+}
+
+func (q *Queries) InsertL2StandardBridgeDepositFinalized(ctx context.Context, arg InsertL2StandardBridgeDepositFinalizedParams) error {
+	_, err := q.exec(ctx, q.insertL2StandardBridgeDepositFinalizedStmt, insertL2StandardBridgeDepositFinalized,
+		arg.BlockNumber,
+		arg.BlockTimestamp,
+		arg.TxHash,
+		arg.FromAddress,
+		arg.ToAddress,
+		arg.L1Token,
+		arg.Amount,
+		arg.Event,
+		arg.MatchingHash,
+	)
+	return err
+}
+
 const updateBlockPointer = `-- name: UpdateBlockPointer :exec
 UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ?
 `
