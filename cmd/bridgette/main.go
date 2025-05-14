@@ -2,13 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"math/big"
 	"os"
 	"os/signal"
-	"time"
 
+	"github.com/Golem-Base/bridgette/pkg/logparser"
 	"github.com/Golem-Base/bridgette/pkg/sqlitestore"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
@@ -36,6 +37,22 @@ const L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK = "l1_standard_bridge_eth_deposit_initi
 const L1_ETH_DEPOSIT_INITIATED_LAST_BLOCK = "l1_standard_bridge_eth_deposit_initiated_last_processed_block"
 const L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK = "l2_standard_bridge_eth_deposit_finalized_lowest_processed_block"
 const L2_ETH_DEPOSIT_FINALIZED_LAST_BLOCK = "l2_standard_bridge_eth_deposit_finalized_last_processed_block"
+
+// Helper function to convert Wei to ETH (1 ETH = 10^18 Wei)
+func weiToEth(wei *big.Int) float64 {
+	if wei == nil {
+		return 0
+	}
+	// Create a big float from wei
+	weiFloat := new(big.Float).SetInt(wei)
+	// Create 10^18 as a big float
+	ethUnit := new(big.Float).SetInt(big.NewInt(1e18))
+	// Divide wei by 10^18 to get ETH
+	ethFloat := new(big.Float).Quo(weiFloat, ethUnit)
+	// Convert to float64
+	eth, _ := ethFloat.Float64()
+	return eth
+}
 
 func main() {
 
@@ -206,17 +223,38 @@ func main() {
 						return fmt.Errorf("failed to filter logs: %w", err)
 					}
 
+					blockTimes := make(map[uint64]uint64)
+
 					for _, log := range logs {
-						// Insert log data into database instead of file
+						header, err := l1Client.HeaderByNumber(egCtx, big.NewInt(int64(log.BlockNumber)))
+						if err != nil {
+							return fmt.Errorf("failed to get header: %w", err)
+						}
+						blockTimes[log.BlockNumber] = header.Time
+					}
+
+					for _, log := range logs {
+						// Parse the event data
+						event, err := logparser.ParseL1StandardBridgeETHDepositInitiatedEvent(&log)
+						if err != nil {
+							return fmt.Errorf("failed to parse log: %w", err)
+						}
+
+						eventJSON, err := json.Marshal(log)
+						if err != nil {
+							return fmt.Errorf("failed to marshal event: %w", err)
+						}
+
+						// Insert log data into database
 						err = txStore.InsertL1StandardBridgeETHDepositInitiated(egCtx, sqlitestore.InsertL1StandardBridgeETHDepositInitiatedParams{
 							BlockNumber:    int64(log.BlockNumber),
-							BlockTimestamp: int64(time.Now().Unix()), // Consider fetching actual block timestamp
+							BlockTimestamp: int64(blockTimes[log.BlockNumber]),
 							TxHash:         log.TxHash.Bytes(),
-							FromAddress:    log.Address.Bytes(),
-							ToAddress:      log.Address.Bytes(), // Extract the actual to address from event data if available
-							Amount:         0,                   // Extract amount from event data if available
-							Event:          log.Data,
-							MatchingHash:   log.TxHash.Bytes(), // Use appropriate hash for matching
+							FromAddress:    event.From.Bytes(),
+							ToAddress:      event.To.Bytes(),
+							Amount:         weiToEth(event.Amount), // Convert Wei to ETH
+							Event:          eventJSON,
+							MatchingHash:   event.DepositMatchingHash().Bytes(),
 						})
 						if err != nil {
 							tx.Rollback()
@@ -306,18 +344,39 @@ func main() {
 						return fmt.Errorf("failed to filter logs: %w", err)
 					}
 
+					blockTimes := make(map[uint64]uint64)
+
 					for _, log := range logs {
+						header, err := l2Client.HeaderByNumber(egCtx, big.NewInt(int64(log.BlockNumber)))
+						if err != nil {
+							return fmt.Errorf("failed to get header: %w", err)
+						}
+						blockTimes[log.BlockNumber] = header.Time
+					}
+
+					for _, log := range logs {
+
+						event, err := logparser.ParseL2StandardBridgeDepositFinalizedEvent(&log)
+						if err != nil {
+							return fmt.Errorf("failed to parse log: %w", err)
+						}
+
+						eventJSON, err := json.Marshal(log)
+						if err != nil {
+							return fmt.Errorf("failed to marshal event: %w", err)
+						}
+
 						// Insert log data into database instead of file
 						err = txStore.InsertL2StandardBridgeDepositFinalized(egCtx, sqlitestore.InsertL2StandardBridgeDepositFinalizedParams{
 							BlockNumber:    int64(log.BlockNumber),
-							BlockTimestamp: int64(time.Now().Unix()), // Consider fetching actual block timestamp
+							BlockTimestamp: int64(blockTimes[log.BlockNumber]),
 							TxHash:         log.TxHash.Bytes(),
-							FromAddress:    log.Address.Bytes(),
-							ToAddress:      log.Address.Bytes(), // Extract the actual to address from event data if available
-							L1Token:        log.Address.Bytes(), // Extract the L1 token address from event data if available
-							Amount:         0,                   // Extract amount from event data if available
-							Event:          log.Data,
-							MatchingHash:   log.TxHash.Bytes(), // Use appropriate hash for matching
+							FromAddress:    event.From.Bytes(),
+							ToAddress:      event.To.Bytes(),
+							L1Token:        event.L1Token.Bytes(),
+							Amount:         weiToEth(event.Amount), // Convert Wei to ETH
+							Event:          eventJSON,
+							MatchingHash:   event.DepositMatchingHash().Bytes(),
 						})
 						if err != nil {
 							tx.Rollback()
