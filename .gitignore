@@ -42,3 +42,4 @@ profile.cov
 
 tests/spec-tests/
 op-k8s-status-cli
+output/

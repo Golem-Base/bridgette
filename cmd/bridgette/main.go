@@ -1,23 +1,34 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"math/big"
 	"os"
 	"os/signal"
+	"path/filepath"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/sync/errgroup"
 )
 
-// ETHBridgeInitiated (index_topic_1 address from, index_topic_2 address to, uint256 amount, bytes extraData)
-// 0x2849b43074093a05396b6f2a937dee8565b15a48a7b3d4bffb732a5017380af5
+// // ETHBridgeInitiated (index_topic_1 address from, index_topic_2 address to, uint256 amount, bytes extraData)
+// // 0x2849b43074093a05396b6f2a937dee8565b15a48a7b3d4bffb732a5017380af5
+// var ethBridgeInitiatedEvent = common.HexToHash("0x2849b43074093a05396b6f2a937dee8565b15a48a7b3d4bffb732a5017380af5")
 
-var ethBridgeInitiatedEvent = common.HexToHash("0x2849b43074093a05396b6f2a937dee8565b15a48a7b3d4bffb732a5017380af5")
+// L1 - sending ETH
+// ETHDepositInitiated (index_topic_1 address from, index_topic_2 address to, uint256 amount, bytes extraData)
+var ethDepositInitiatedEvent = common.HexToHash("0x35d79ab81f2b2017e19afb5c5571778877782d7a8786f5907f93b0f4702f4f23")
+
+var l2StandardBridgeAddress = common.HexToAddress("0x4200000000000000000000000000000000000010")
+
+// L2 - receiving ETH
+// DepositFinalized (index_topic_1 address l1Token, index_topic_2 address l2Token, index_topic_3 address from, address to, uint256 amount, bytes extraData)
+var ethDepositFinalizedEvent = common.HexToHash("0xb0444523268717a02698be47d0803aa7468c00acbed2f8bd93a0459cde61dd89")
 
 func main() {
 
@@ -92,75 +103,192 @@ func main() {
 
 			log := log.With("l1_bridge_address", bridgeAddress)
 
-			fromBlock := uint64(8311163 - 200)
+			// fromBlock := uint64(8311163 - 200)
 
-			logsChan := make(chan types.Log, 200)
-			sub, err := l1Client.SubscribeFilterLogs(
-				ctx,
-				ethereum.FilterQuery{
-					Addresses: []common.Address{bridgeAddress},
-					Topics:    [][]common.Hash{{ethBridgeInitiatedEvent}},
-					FromBlock: big.NewInt(int64(fromBlock)),
-				},
-				logsChan,
-			)
+			// logsChan := make(chan types.Log, 200)
+			// sub, err := l1Client.SubscribeFilterLogs(
+			// 	ctx,
+			// 	ethereum.FilterQuery{
+			// 		Addresses: []common.Address{bridgeAddress},
+			// 		Topics:    [][]common.Hash{{ethBridgeInitiatedEvent}},
+			// 		FromBlock: big.NewInt(int64(fromBlock)),
+			// 	},
+			// 	logsChan,
+			// )
 
-			go func() {
-				select {
-				case err := <-sub.Err():
-					log.Error("subscription error", "error", err)
-					stop()
-				case <-ctx.Done():
-					log.Info("context done")
-					return
-				}
-			}()
+			// go func() {
+			// 	select {
+			// 	case err := <-sub.Err():
+			// 		log.Error("subscription error", "error", err)
+			// 		stop()
+			// 	case <-ctx.Done():
+			// 		log.Info("context done")
+			// 		return
+			// 	}
+			// }()
 
-			// fromBlock, err := l1Client.BlockNumber(ctx)
-			// if err != nil {
-			// 	return fmt.Errorf("failed to get current block number: %w", err)
-			// }
+			eg, egCtx := errgroup.WithContext(ctx)
 
-			// fromBlock = currentBlock.Uint64()
+			eg.Go(func() error {
 
-			if err != nil {
-				return fmt.Errorf("failed to subscribe to filter logs: %w", err)
-			}
-			log.Info("subscribed to filter logs")
+				log := log.With("chain", "l1")
 
-			for {
+				l1OutpuPath := filepath.Join("output", "l1")
 
-				select {
-				case l := <-logsChan:
-					log.Info("got log", "block_number", l.BlockNumber, "tx_hash", l.TxHash, "address", l.Address, "topics", l.Topics)
-				case <-ctx.Done():
-					log.Info("context done")
-					return nil
+				fromBlock, err := l1Client.BlockNumber(egCtx)
+				if err != nil {
+					return fmt.Errorf("failed to get current block number: %w", err)
 				}
 
-				// log.Info("got log", "block_number", l.BlockNumber, "tx_hash", l.TxHash, "address", l.Address, "topics", l.Topics)
+				for fromBlock > 0 {
 
-				// logs, err := l1Client.FilterLogs(ctx, ethereum.FilterQuery{
-				// 	Addresses: []common.Address{bridgeAddress},
-				// 	Topics:    [][]common.Hash{{ethBridgeInitiatedEvent}},
-				// 	FromBlock: big.NewInt(int64(fromBlock)),
-				// })
-				// if err != nil {
-				// 	return fmt.Errorf("failed to filter logs: %w", err)
-				// }
+					toBlock := fromBlock - 1
 
-				// if len(logs) == 0 {
-				// 	log.Info("no logs found", "from_block", fromBlock)
-				// 	break
-				// }
+					if fromBlock > 10_000 {
+						fromBlock -= 10_000
+					} else {
+						fromBlock = 0
+					}
 
-				// log.Info("got logs", "from_block", fromBlock, "count", len(logs))
+					log.Info("filtering logs", "from_block", fromBlock, "to_block", toBlock)
 
-				// fromBlock = logs[len(logs)-1].BlockNumber + 1
+					logs, err := l1Client.FilterLogs(egCtx, ethereum.FilterQuery{
+						Addresses: []common.Address{bridgeAddress},
+						Topics:    [][]common.Hash{{ethDepositInitiatedEvent}},
+						FromBlock: big.NewInt(int64(fromBlock)),
+						ToBlock:   big.NewInt(int64(toBlock)),
+					})
+					if err != nil {
+						return fmt.Errorf("failed to filter logs: %w", err)
+					}
 
-			}
+					for _, log := range logs {
+						fileName := filepath.Join(l1OutpuPath, fmt.Sprintf("%018d-%04d-%04d.json", log.BlockNumber, log.TxIndex, log.Index))
 
-			return nil
+						file, err := os.Create(fileName)
+						if err != nil {
+							return fmt.Errorf("failed to create file: %w", err)
+						}
+
+						err = json.NewEncoder(file).Encode(log)
+						if err != nil {
+							return fmt.Errorf("failed to encode log: %w", err)
+						}
+
+						err = file.Close()
+						if err != nil {
+							return fmt.Errorf("failed to close file: %w", err)
+						}
+
+					}
+
+					// transactionsHashes := map[common.Hash]bool{}
+
+					// for _, log := range logs {
+					// 	transactionsHashes[log.TxHash] = true
+					// }
+
+					// for txHash := range transactionsHashes {
+					// 	receipt, err := l1Client.TransactionReceipt(egCtx, txHash)
+					// 	if err != nil {
+					// 		return fmt.Errorf("failed to get transaction receipt: %w", err)
+					// 	}
+
+					// 	fileName := filepath.Join(l1OutpuPath, fmt.Sprintf("%018d-%04d.json", receipt.BlockNumber.Uint64(), receipt.TransactionIndex))
+
+					// 	file, err := os.Create(fileName)
+					// 	if err != nil {
+					// 		return fmt.Errorf("failed to create file: %w", err)
+					// 	}
+
+					// 	err = json.NewEncoder(file).Encode(receipt)
+					// 	if err != nil {
+					// 		return fmt.Errorf("failed to encode receipt: %w", err)
+					// 	}
+
+					// 	err = file.Close()
+					// 	if err != nil {
+					// 		return fmt.Errorf("failed to close file: %w", err)
+					// 	}
+
+					// }
+
+					if len(logs) == 0 {
+						log.Info("no logs found", "from_block", fromBlock)
+						break
+					} else {
+						log.Info("got logs", "from_block", fromBlock, "count", len(logs))
+					}
+
+				}
+
+				return nil
+			})
+
+			eg.Go(func() error {
+
+				log := log.With("chain", "l2")
+
+				l2OutpuPath := filepath.Join("output", "l2")
+
+				fromBlock, err := l2Client.BlockNumber(egCtx)
+				if err != nil {
+					return fmt.Errorf("failed to get current block number: %w", err)
+				}
+
+				for fromBlock > 0 {
+
+					toBlock := fromBlock - 1
+
+					if fromBlock > 10_000 {
+						fromBlock -= 10_000
+					} else {
+						fromBlock = 0
+					}
+
+					log.Info("filtering logs", "from_block", fromBlock, "to_block", toBlock)
+
+					logs, err := l2Client.FilterLogs(egCtx, ethereum.FilterQuery{
+						Addresses: []common.Address{l2StandardBridgeAddress},
+						Topics:    [][]common.Hash{{ethDepositFinalizedEvent}},
+						FromBlock: big.NewInt(int64(fromBlock)),
+						ToBlock:   big.NewInt(int64(toBlock)),
+					})
+					if err != nil {
+						return fmt.Errorf("failed to filter logs: %w", err)
+					}
+
+					for _, log := range logs {
+						fileName := filepath.Join(l2OutpuPath, fmt.Sprintf("%018d-%04d-%04d.json", log.BlockNumber, log.TxIndex, log.Index))
+
+						file, err := os.Create(fileName)
+						if err != nil {
+							return fmt.Errorf("failed to create file: %w", err)
+						}
+
+						err = json.NewEncoder(file).Encode(log)
+						if err != nil {
+							return fmt.Errorf("failed to encode log: %w", err)
+						}
+
+						err = file.Close()
+						if err != nil {
+							return fmt.Errorf("failed to close file: %w", err)
+						}
+
+					}
+
+					if len(logs) == 0 {
+						log.Info("no logs found", "from_block", fromBlock)
+					} else {
+						log.Info("got logs", "from_block", fromBlock, "count", len(logs))
+					}
+
+				}
+
+				return nil
+			})
+			return eg.Wait()
 		},
 	}
 

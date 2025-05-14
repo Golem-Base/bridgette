@@ -1,0 +1,24 @@
+CREATE TABLE IF NOT EXISTS l1_bridge_initiated (
+    id UNSIGNED BIG INT PRIMARY KEY AUTOINCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    block_number UNSIGNED BIG INT NOT NULL,
+    tx_hash BLOB NOT NULL,
+    from_address BLOB NOT NULL,
+    to_address BLOB NOT NULL,    
+    amount BLOB NOT NULL,
+    extra_data BLOB NOT NULL
+
+);
+
+
+CREATE TABLE IF NOT EXISTS l2_bridge_initiated (
+    id UNSIGNED BIG INT PRIMARY KEY AUTOINCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    block_number UNSIGNED BIG INT NOT NULL,
+    tx_hash BLOB NOT NULL,
+    from_address BLOB NOT NULL,
+    to_address BLOB NOT NULL,    
+    amount BLOB NOT NULL,
+);
