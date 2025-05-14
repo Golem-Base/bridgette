@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS l1_standard_bridge_eth_deposit_initiated;
+DROP TABLE IF EXISTS l2_standard_bridge_deposit_finalized;
+
+DROP INDEX IF EXISTS idx_l1_standard_bridge_eth_deposit_initiated_matching_hash;
+DROP INDEX IF EXISTS idx_l2_standard_bridge_deposit_finalized_matching_hash; 
+
+DROP INDEX IF EXISTS idx_l1_standard_bridge_eth_deposit_initiated_matched_l2_standard_bridge_deposit_finalized_id;
+DROP INDEX IF EXISTS idx_l2_standard_bridge_deposit_finalized_matched_l1_standard_bridge_eth_deposit_initiated_id;

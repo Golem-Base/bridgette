@@ -2,8 +2,9 @@ version: "2"
 sql:
   - engine: "sqlite"
     queries: "query.sql"
-    schema: "schema.sql"
+    schema: "migrations"
     gen:
       go:
         package: "sqlitestore"
-        out: "sqlitestore"
+        out: "."
+        emit_pointers_for_null_types: true

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -9,9 +10,11 @@ import (
 	"os/signal"
 	"path/filepath"
 
+	"github.com/Golem-Base/bridgette/pkg/sqlitestore"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/sync/errgroup"
 )
@@ -37,7 +40,7 @@ func main() {
 	cfg := struct {
 		l1ExecutionURL  string
 		l2ExecutionURL  string
-		dbPath          string
+		dbURL           string
 		addr            string
 		l1BridgeAddress string
 	}{}
@@ -61,11 +64,11 @@ func main() {
 				Destination: &cfg.l2ExecutionURL,
 			},
 			&cli.StringFlag{
-				Name:        "db-path",
-				Usage:       "The path to the database",
-				EnvVars:     []string{"DB_PATH"},
-				Required:    true,
-				Destination: &cfg.dbPath,
+				Name:        "db-url",
+				Usage:       "The URL of the database",
+				EnvVars:     []string{"DB_URL"},
+				Destination: &cfg.dbURL,
+				Value:       "file:./store/bridgette.db?_txlock=immediate&_auto_vacuum=2&_journal_mode=WAL&_busy_timeout=5000&_foreign_keys=true",
 			},
 			&cli.StringFlag{
 				Name:        "addr",
@@ -83,6 +86,19 @@ func main() {
 			},
 		},
 		Action: func(c *cli.Context) error {
+
+			// Open database
+			db, err := sql.Open("sqlite3", cfg.dbURL)
+			if err != nil {
+				return fmt.Errorf("failed to open database: %w", err)
+			}
+			defer db.Close()
+			log.Info("database opened", "url", cfg.dbURL)
+
+			err = sqlitestore.Migrate(db)
+			if err != nil {
+				return fmt.Errorf("failed to migrate database: %w", err)
+			}
 
 			ctx, stop := signal.NotifyContext(c.Context, os.Interrupt, os.Kill)
 			defer stop()

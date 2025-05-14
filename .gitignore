@@ -30,7 +30,7 @@
 /geth*.tar.gz.asc
 /geth*.zip.sig
 /geth*.zip.asc
-
+store/
 
 # travis
 profile.tmp
