@@ -6,15 +6,22 @@ import (
 	"github.com/ethereum-optimism/optimism/op-e2e/bindings"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func ParseL2StandardBridgeDepositFinalizedEvent(log *types.Log) (*bindings.L2StandardBridgeDepositFinalized, error) {
+type L2StandardBridgeDepositFinalized bindings.L2StandardBridgeDepositFinalized
+
+func (e *L2StandardBridgeDepositFinalized) DepositMatchingHash() common.Hash {
+	return crypto.Keccak256Hash(e.L1Token.Bytes(), e.From.Bytes(), e.Amount.Bytes(), e.ExtraData)
+}
+
+func ParseL2StandardBridgeDepositFinalizedEvent(log *types.Log) (*L2StandardBridgeDepositFinalized, error) {
 	contractAbi, err := bindings.L2StandardBridgeMetaData.GetAbi()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get L2StandardBridge ABI: %w", err)
 	}
 
-	event := new(bindings.L2StandardBridgeDepositFinalized)
+	event := new(L2StandardBridgeDepositFinalized)
 	err = contractAbi.UnpackIntoInterface(event, "DepositFinalized", log.Data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unpack log data: %w", err)
