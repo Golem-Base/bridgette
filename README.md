@@ -52,7 +52,7 @@ The web UI provides a dashboard showing bridge statistics and a timeline of depo
 go mod tidy
 
 # Generate templ templates
-cd pkg/webui && ./generate.sh
+go generate ./pkg/webui
 
 # Build the application
 go build -o bridgette cmd/bridgette/main.go

@@ -1,3 +1,4 @@
 #!/bin/bash
-go install github.com/a-h/templ/cmd/templ@latest
+# NOTE: This script is deprecated in favor of using 'go generate' 
+# To generate templ files, run: go generate ./pkg/webui
 templ generate 
