@@ -197,11 +197,59 @@ func main() {
 					return fmt.Errorf("failed to get lowest processed block: %w", err)
 				}
 
-				if lowestProcessedBlock != nil {
-					fromBlock = uint64(*lowestProcessedBlock)
+				if lowestProcessedBlock.BlockNumber != nil {
+					fromBlock = uint64(*lowestProcessedBlock.BlockNumber)
 				}
 
 				for fromBlock > 0 {
+
+					toBlock := fromBlock - 1
+
+					if fromBlock > 10_000 {
+						fromBlock -= 10_000
+					} else {
+						fromBlock = 0
+					}
+
+					// Update the last processed block pointer if it's NULL
+					toBlockNumber := int64(toBlock)
+
+					// Get block time for the latest block directly from RPC client
+					toBlockHeader, err := l1Client.HeaderByNumber(egCtx, big.NewInt(int64(toBlock)))
+					if err != nil {
+						return fmt.Errorf("failed to get header for toBlock: %w", err)
+					}
+					toBlockTime := int64(toBlockHeader.Time)
+
+					log.Info("filtering logs", "from_block", fromBlock, "to_block", toBlock)
+
+					logs, err := l1Client.FilterLogs(egCtx, ethereum.FilterQuery{
+						Addresses: []common.Address{bridgeAddress},
+						Topics:    [][]common.Hash{{ethDepositInitiatedEvent}},
+						FromBlock: big.NewInt(int64(fromBlock)),
+						ToBlock:   big.NewInt(int64(toBlock)),
+					})
+					if err != nil {
+						return fmt.Errorf("failed to filter logs: %w", err)
+					}
+
+					// Get block time for the lowest block
+					lowBlockHeader, err := l1Client.HeaderByNumber(egCtx, big.NewInt(int64(fromBlock)))
+					if err != nil {
+						return fmt.Errorf("failed to get header for lowest block: %w", err)
+					}
+					lowBlockTime := int64(lowBlockHeader.Time)
+
+					blockTimes := make(map[uint64]uint64)
+
+					for _, log := range logs {
+						header, err := l1Client.HeaderByNumber(egCtx, big.NewInt(int64(log.BlockNumber)))
+						if err != nil {
+							return fmt.Errorf("failed to get header: %w", err)
+						}
+						blockTimes[log.BlockNumber] = header.Time
+					}
+
 					// Start a transaction at the beginning of each loop iteration
 					tx, err := db.Begin()
 					if err != nil {
@@ -216,37 +264,6 @@ func main() {
 							tx.Rollback()
 						}
 					}()
-
-					toBlock := fromBlock - 1
-
-					if fromBlock > 10_000 {
-						fromBlock -= 10_000
-					} else {
-						fromBlock = 0
-					}
-
-					log.Info("filtering logs", "from_block", fromBlock, "to_block", toBlock)
-
-					logs, err := l1Client.FilterLogs(egCtx, ethereum.FilterQuery{
-						Addresses: []common.Address{bridgeAddress},
-						Topics:    [][]common.Hash{{ethDepositInitiatedEvent}},
-						FromBlock: big.NewInt(int64(fromBlock)),
-						ToBlock:   big.NewInt(int64(toBlock)),
-					})
-					if err != nil {
-						tx.Rollback()
-						return fmt.Errorf("failed to filter logs: %w", err)
-					}
-
-					blockTimes := make(map[uint64]uint64)
-
-					for _, log := range logs {
-						header, err := l1Client.HeaderByNumber(egCtx, big.NewInt(int64(log.BlockNumber)))
-						if err != nil {
-							return fmt.Errorf("failed to get header: %w", err)
-						}
-						blockTimes[log.BlockNumber] = header.Time
-					}
 
 					for _, lg := range logs {
 						// Parse the event data
@@ -333,18 +350,18 @@ func main() {
 					blockNumber := int64(fromBlock)
 
 					err = txStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
-						Name:        L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK,
 						BlockNumber: &blockNumber,
+						BlockTime:   &lowBlockTime,
+						Name:        L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK,
 					})
 					if err != nil {
 						tx.Rollback()
 						return fmt.Errorf("failed to update block pointer: %w", err)
 					}
 
-					// Update the last processed block pointer if it's NULL
-					toBlockNumber := int64(toBlock)
 					err = txStore.UpdateBlockPointerIfNull(egCtx, sqlitestore.UpdateBlockPointerIfNullParams{
 						BlockNumber: &toBlockNumber,
+						BlockTime:   &toBlockTime,
 						Name:        L1_ETH_DEPOSIT_INITIATED_LAST_BLOCK,
 					})
 					if err != nil {
@@ -371,31 +388,16 @@ func main() {
 					return fmt.Errorf("failed to get current block number: %w", err)
 				}
 
-				lowestProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L1_ETH_DEPOSIT_INITIATED_LOW_BLOCK)
+				lowestProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK)
 				if err != nil {
 					return fmt.Errorf("failed to get lowest processed block: %w", err)
 				}
 
-				if lowestProcessedBlock != nil {
-					fromBlock = uint64(*lowestProcessedBlock)
+				if lowestProcessedBlock.BlockNumber != nil {
+					fromBlock = uint64(*lowestProcessedBlock.BlockNumber)
 				}
 
 				for fromBlock > 0 {
-					// Start a transaction at the beginning of each loop iteration
-					tx, err := db.Begin()
-					if err != nil {
-						return fmt.Errorf("failed to begin transaction: %w", err)
-					}
-					// Create a transaction-wrapped store
-					txStore := sqlitestore.New(tx).WithTx(tx)
-
-					defer func() {
-						// If we exit with error, ensure we roll back the transaction
-						if err != nil {
-							tx.Rollback()
-						}
-					}()
-
 					toBlock := fromBlock - 1
 
 					if fromBlock > 10_000 {
@@ -413,7 +415,6 @@ func main() {
 						ToBlock:   big.NewInt(int64(toBlock)),
 					})
 					if err != nil {
-						tx.Rollback()
 						return fmt.Errorf("failed to filter logs: %w", err)
 					}
 
@@ -426,6 +427,38 @@ func main() {
 						}
 						blockTimes[log.BlockNumber] = header.Time
 					}
+
+					// Get block time for the lowest block
+					lowBlockHeader, err := l2Client.HeaderByNumber(egCtx, big.NewInt(int64(fromBlock)))
+					if err != nil {
+						return fmt.Errorf("failed to get header for lowest block: %w", err)
+					}
+					lowBlockTime := int64(lowBlockHeader.Time)
+
+					// Update the last processed block pointer if it's NULL
+					toBlockNumber := int64(toBlock)
+
+					// Get block time for the latest block directly from RPC client
+					toBlockHeader, err := l2Client.HeaderByNumber(egCtx, big.NewInt(int64(toBlock)))
+					if err != nil {
+						return fmt.Errorf("failed to get header for toBlock: %w", err)
+					}
+					toBlockTime := int64(toBlockHeader.Time)
+
+					// Start a transaction at the beginning of each loop iteration
+					tx, err := db.Begin()
+					if err != nil {
+						return fmt.Errorf("failed to begin transaction: %w", err)
+					}
+					// Create a transaction-wrapped store
+					txStore := sqlitestore.New(tx).WithTx(tx)
+
+					defer func() {
+						// If we exit with error, ensure we roll back the transaction
+						if err != nil {
+							tx.Rollback()
+						}
+					}()
 
 					for _, lg := range logs {
 
@@ -514,16 +547,16 @@ func main() {
 					err = txStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
 						Name:        L2_ETH_DEPOSIT_FINALIZED_LOW_BLOCK,
 						BlockNumber: &blockNumber,
+						BlockTime:   &lowBlockTime,
 					})
 					if err != nil {
 						tx.Rollback()
 						return fmt.Errorf("failed to update block pointer: %w", err)
 					}
 
-					// Update the last processed block pointer if it's NULL
-					toBlockNumber := int64(toBlock)
 					err = txStore.UpdateBlockPointerIfNull(egCtx, sqlitestore.UpdateBlockPointerIfNullParams{
 						BlockNumber: &toBlockNumber,
+						BlockTime:   &toBlockTime,
 						Name:        L2_ETH_DEPOSIT_FINALIZED_LAST_BLOCK,
 					})
 					if err != nil {

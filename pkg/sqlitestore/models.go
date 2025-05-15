@@ -11,6 +11,7 @@ import (
 type BLOCKPOINTER struct {
 	Name        string
 	BlockNumber *int64
+	BlockTime   *int64
 }
 
 type L1StandardBridgeEthDepositInitiated struct {

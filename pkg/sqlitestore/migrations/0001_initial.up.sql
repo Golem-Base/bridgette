@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS l2_standard_bridge_deposit_finalized (
 
 CREATE TABLE IF NOT EXISTS BLOCK_POINTERS (
     name TEXT PRIMARY KEY,
-    block_number UNSIGNED BIG INT
+    block_number UNSIGNED BIG INT,
+    block_time UNSIGNED BIG INT
 );
 
 
@@ -42,8 +43,8 @@ CREATE INDEX IF NOT EXISTS idx_l1_standard_bridge_eth_deposit_initiated_matched_
 CREATE INDEX IF NOT EXISTS idx_l2_standard_bridge_deposit_finalized_matched_l1_standard_bridge_eth_deposit_initiated_id ON l2_standard_bridge_deposit_finalized(matched_l1_standard_bridge_eth_deposit_initiated_id);
 
 
-INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number) VALUES ('l1_standard_bridge_eth_deposit_initiated_lowest_processed_block', NULL);
-INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number) VALUES ('l1_standard_bridge_eth_deposit_initiated_last_processed_block', NULL);
+INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number, block_time) VALUES ('l1_standard_bridge_eth_deposit_initiated_lowest_processed_block', NULL, NULL);
+INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number, block_time) VALUES ('l1_standard_bridge_eth_deposit_initiated_last_processed_block', NULL, NULL);
 
-INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number) VALUES ('l2_standard_bridge_eth_deposit_finalized_lowest_processed_block', NULL);
-INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number) VALUES ('l2_standard_bridge_eth_deposit_finalized_last_processed_block', NULL);
+INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number, block_time) VALUES ('l2_standard_bridge_eth_deposit_finalized_lowest_processed_block', NULL, NULL);
+INSERT OR IGNORE INTO BLOCK_POINTERS (name, block_number, block_time) VALUES ('l2_standard_bridge_eth_deposit_finalized_last_processed_block', NULL, NULL);

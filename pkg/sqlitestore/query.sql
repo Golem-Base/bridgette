@@ -20,13 +20,13 @@ INSERT INTO l1_standard_bridge_eth_deposit_initiated (
 ) RETURNING id;
 
 -- name: GetBlockPointer :one
-SELECT block_number FROM BLOCK_POINTERS WHERE name = ? LIMIT 1;
+SELECT block_number, block_time FROM BLOCK_POINTERS WHERE name = ? LIMIT 1;
 
 -- name: UpdateBlockPointer :exec
-UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ?;
+UPDATE BLOCK_POINTERS SET block_number = ?, block_time = ? WHERE name = ?;
 
 -- name: UpdateBlockPointerIfNull :exec
-UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ? AND block_number IS NULL;
+UPDATE BLOCK_POINTERS SET block_number = ?, block_time = ? WHERE name = ? AND block_number IS NULL;
 
 -- name: InsertL2StandardBridgeDepositFinalized :one
 INSERT INTO l2_standard_bridge_deposit_finalized (

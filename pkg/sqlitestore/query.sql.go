@@ -106,14 +106,19 @@ func (q *Queries) FindMatchingL2Deposits(ctx context.Context, arg FindMatchingL2
 }
 
 const getBlockPointer = `-- name: GetBlockPointer :one
-SELECT block_number FROM BLOCK_POINTERS WHERE name = ? LIMIT 1
+SELECT block_number, block_time FROM BLOCK_POINTERS WHERE name = ? LIMIT 1
 `
 
-func (q *Queries) GetBlockPointer(ctx context.Context, name string) (*int64, error) {
+type GetBlockPointerRow struct {
+	BlockNumber *int64
+	BlockTime   *int64
+}
+
+func (q *Queries) GetBlockPointer(ctx context.Context, name string) (GetBlockPointerRow, error) {
 	row := q.queryRow(ctx, q.getBlockPointerStmt, getBlockPointer, name)
-	var block_number *int64
-	err := row.Scan(&block_number)
-	return block_number, err
+	var i GetBlockPointerRow
+	err := row.Scan(&i.BlockNumber, &i.BlockTime)
+	return i, err
 }
 
 const getBridgeStats = `-- name: GetBridgeStats :one
@@ -413,30 +418,32 @@ func (q *Queries) InsertL2StandardBridgeDepositFinalized(ctx context.Context, ar
 }
 
 const updateBlockPointer = `-- name: UpdateBlockPointer :exec
-UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ?
+UPDATE BLOCK_POINTERS SET block_number = ?, block_time = ? WHERE name = ?
 `
 
 type UpdateBlockPointerParams struct {
 	BlockNumber *int64
+	BlockTime   *int64
 	Name        string
 }
 
 func (q *Queries) UpdateBlockPointer(ctx context.Context, arg UpdateBlockPointerParams) error {
-	_, err := q.exec(ctx, q.updateBlockPointerStmt, updateBlockPointer, arg.BlockNumber, arg.Name)
+	_, err := q.exec(ctx, q.updateBlockPointerStmt, updateBlockPointer, arg.BlockNumber, arg.BlockTime, arg.Name)
 	return err
 }
 
 const updateBlockPointerIfNull = `-- name: UpdateBlockPointerIfNull :exec
-UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ? AND block_number IS NULL
+UPDATE BLOCK_POINTERS SET block_number = ?, block_time = ? WHERE name = ? AND block_number IS NULL
 `
 
 type UpdateBlockPointerIfNullParams struct {
 	BlockNumber *int64
+	BlockTime   *int64
 	Name        string
 }
 
 func (q *Queries) UpdateBlockPointerIfNull(ctx context.Context, arg UpdateBlockPointerIfNullParams) error {
-	_, err := q.exec(ctx, q.updateBlockPointerIfNullStmt, updateBlockPointerIfNull, arg.BlockNumber, arg.Name)
+	_, err := q.exec(ctx, q.updateBlockPointerIfNullStmt, updateBlockPointerIfNull, arg.BlockNumber, arg.BlockTime, arg.Name)
 	return err
 }
 
