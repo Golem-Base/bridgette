@@ -101,8 +101,8 @@ func GetBridgeStats(ctx context.Context, db *sql.DB) (map[string]interface{}, er
 	if err != nil {
 		// Handle case when no L1 blocks exist yet
 		if err == sql.ErrNoRows {
-			latestL1Block.BlockNumber = 0
-			latestL1Block.BlockTimestamp = 0
+			// Create a zero struct
+			latestL1Block = sqlitestore.GetLatestL1BlockRow{}
 		} else {
 			return nil, err
 		}
@@ -113,8 +113,8 @@ func GetBridgeStats(ctx context.Context, db *sql.DB) (map[string]interface{}, er
 	if err != nil {
 		// Handle case when no L2 blocks exist yet
 		if err == sql.ErrNoRows {
-			latestL2Block.BlockNumber = 0
-			latestL2Block.BlockTimestamp = 0
+			// Create a zero struct
+			latestL2Block = sqlitestore.GetLatestL2BlockRow{}
 		} else {
 			return nil, err
 		}
@@ -122,8 +122,15 @@ func GetBridgeStats(ctx context.Context, db *sql.DB) (map[string]interface{}, er
 
 	// Calculate time since last block
 	currentTime := time.Now().Unix()
-	l1TimeSince := float64(currentTime - latestL1Block.BlockTimestamp)
-	l2TimeSince := float64(currentTime - latestL2Block.BlockTimestamp)
+	var l1TimeSince, l2TimeSince float64
+
+	// Only calculate time since if we have valid timestamps
+	if latestL1Block.BlockTimestamp != nil && *latestL1Block.BlockTimestamp > 0 {
+		l1TimeSince = float64(currentTime - *latestL1Block.BlockTimestamp)
+	}
+	if latestL2Block.BlockTimestamp != nil && *latestL2Block.BlockTimestamp > 0 {
+		l2TimeSince = float64(currentTime - *latestL2Block.BlockTimestamp)
+	}
 
 	// Handle nullable fields
 	var avgTimeDiff, minTimeDiff, maxTimeDiff, totalBridgedEth float64
@@ -155,6 +162,15 @@ func GetBridgeStats(ctx context.Context, db *sql.DB) (map[string]interface{}, er
 		totalBridgedEth = *stats.TotalBridgedEth
 	}
 
+	// Get block numbers, handling null values
+	var l1BlockNum, l2BlockNum int
+	if latestL1Block.BlockNumber != nil {
+		l1BlockNum = int(*latestL1Block.BlockNumber)
+	}
+	if latestL2Block.BlockNumber != nil {
+		l2BlockNum = int(*latestL2Block.BlockNumber)
+	}
+
 	// Create a map with the results
 	result := map[string]interface{}{
 		"total_matched":     int(stats.TotalMatched),
@@ -163,8 +179,8 @@ func GetBridgeStats(ctx context.Context, db *sql.DB) (map[string]interface{}, er
 		"max_time_diff":     maxTimeDiff,
 		"total_bridged_eth": totalBridgedEth,
 		"pending_deposits":  int(pendingDeposits),
-		"latest_l1_block":   int(latestL1Block.BlockNumber),
-		"latest_l2_block":   int(latestL2Block.BlockNumber),
+		"latest_l1_block":   l1BlockNum,
+		"latest_l2_block":   l2BlockNum,
 		"l1_time_since":     l1TimeSince,
 		"l2_time_since":     l2TimeSince,
 	}

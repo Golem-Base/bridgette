@@ -160,17 +160,17 @@ func (q *Queries) GetBridgeStats(ctx context.Context) (GetBridgeStatsRow, error)
 const getLatestL1Block = `-- name: GetLatestL1Block :one
 SELECT 
     block_number,
-    block_timestamp
+    block_time as block_timestamp
 FROM 
-    l1_standard_bridge_eth_deposit_initiated
-ORDER BY 
-    block_number DESC
+    BLOCK_POINTERS
+WHERE 
+    name = 'l1_standard_bridge_eth_deposit_initiated_last_processed_block'
 LIMIT 1
 `
 
 type GetLatestL1BlockRow struct {
-	BlockNumber    int64
-	BlockTimestamp int64
+	BlockNumber    *int64
+	BlockTimestamp *int64
 }
 
 func (q *Queries) GetLatestL1Block(ctx context.Context) (GetLatestL1BlockRow, error) {
@@ -183,17 +183,17 @@ func (q *Queries) GetLatestL1Block(ctx context.Context) (GetLatestL1BlockRow, er
 const getLatestL2Block = `-- name: GetLatestL2Block :one
 SELECT 
     block_number,
-    block_timestamp
+    block_time as block_timestamp
 FROM 
-    l2_standard_bridge_deposit_finalized
-ORDER BY 
-    block_number DESC
+    BLOCK_POINTERS
+WHERE 
+    name = 'l2_standard_bridge_eth_deposit_finalized_last_processed_block'
 LIMIT 1
 `
 
 type GetLatestL2BlockRow struct {
-	BlockNumber    int64
-	BlockTimestamp int64
+	BlockNumber    *int64
+	BlockTimestamp *int64
 }
 
 func (q *Queries) GetLatestL2Block(ctx context.Context) (GetLatestL2BlockRow, error) {
