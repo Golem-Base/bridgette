@@ -8,6 +8,7 @@ import (
 	"math/big"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/Golem-Base/bridgette/pkg/logparser"
 	"github.com/Golem-Base/bridgette/pkg/sqlitestore"
@@ -66,6 +67,8 @@ func main() {
 		addr            string
 		l1BridgeAddress string
 		webUIAddr       string
+		l1BlockInterval time.Duration
+		l2BlockInterval time.Duration
 	}{}
 
 	app := &cli.App{
@@ -113,6 +116,20 @@ func main() {
 				EnvVars:     []string{"WEB_UI_ADDR"},
 				Value:       ":8085",
 				Destination: &cfg.webUIAddr,
+			},
+			&cli.DurationFlag{
+				Name:        "l1-block-interval",
+				Usage:       "The interval for the L1 block",
+				EnvVars:     []string{"L1_BLOCK_INTERVAL"},
+				Value:       time.Second * 2,
+				Destination: &cfg.l1BlockInterval,
+			},
+			&cli.DurationFlag{
+				Name:        "l2-block-interval",
+				Usage:       "The interval for the L2 block",
+				Value:       time.Second * 2,
+				EnvVars:     []string{"L2_BLOCK_INTERVAL"},
+				Destination: &cfg.l2BlockInterval,
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -176,12 +193,6 @@ func main() {
 			autocommitStore := sqlitestore.New(db)
 
 			eg, egCtx := errgroup.WithContext(ctx)
-
-			// Add web UI server
-			webServer := webui.NewServer(db, log.With("component", "webui"), cfg.webUIAddr)
-			eg.Go(func() error {
-				return webServer.Start(egCtx)
-			})
 
 			eg.Go(func() error {
 
@@ -573,6 +584,416 @@ func main() {
 
 				return nil
 			})
+			err = eg.Wait()
+			if err != nil {
+				return fmt.Errorf("error backfilling logs: %w", err)
+			}
+
+			log.Info("backfilling logs completed")
+
+			// start forward filling
+			log.Info("starting forward filling")
+
+			// Keep running until context is cancelled
+			eg, egCtx = errgroup.WithContext(ctx)
+
+			// Forward filling for L1
+			eg.Go(func() error {
+				log := log.With("chain", "l1", "mode", "forward")
+
+				sleepDuration := cfg.l1BlockInterval
+				pollTicker := time.NewTicker(sleepDuration)
+				defer pollTicker.Stop()
+
+				for {
+					select {
+					case <-egCtx.Done():
+						return egCtx.Err()
+					case <-pollTicker.C:
+						log.Info("forward filling", "sleep_duration", sleepDuration)
+						// Get the last processed block
+						lastProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L1_ETH_DEPOSIT_INITIATED_LAST_BLOCK)
+						if err != nil {
+							return fmt.Errorf("failed to get last processed block: %w", err)
+						}
+
+						var fromBlock uint64
+						if lastProcessedBlock.BlockNumber != nil {
+							fromBlock = uint64(*lastProcessedBlock.BlockNumber) + 1
+						} else {
+							// If last processed block is nil, get the current block and start from there
+							currentBlock, err := l1Client.BlockNumber(egCtx)
+							if err != nil {
+								return fmt.Errorf("failed to get current block number: %w", err)
+							}
+							fromBlock = currentBlock
+						}
+
+						// Get the current head block
+						headBlock, err := l1Client.BlockNumber(egCtx)
+						if err != nil {
+							return fmt.Errorf("failed to get current block number: %w", err)
+						}
+
+						// If we're already at the head, skip this iteration
+						if fromBlock > headBlock {
+							log.Info("already at head, skipping", "from_block", fromBlock, "head_block", headBlock)
+							continue
+						}
+
+						// Process blocks in chunks of max 100
+						toBlock := fromBlock + 99
+						if toBlock > headBlock {
+							toBlock = headBlock
+						}
+
+						log.Info("forward filling", "from_block", fromBlock, "to_block", toBlock)
+
+						logs, err := l1Client.FilterLogs(egCtx, ethereum.FilterQuery{
+							Addresses: []common.Address{bridgeAddress},
+							Topics:    [][]common.Hash{{ethDepositInitiatedEvent}},
+							FromBlock: big.NewInt(int64(fromBlock)),
+							ToBlock:   big.NewInt(int64(toBlock)),
+						})
+						if err != nil {
+							return fmt.Errorf("failed to filter logs: %w", err)
+						}
+
+						// Get block times for each block with events
+						blockTimes := make(map[uint64]uint64)
+						for _, log := range logs {
+							if _, exists := blockTimes[log.BlockNumber]; !exists {
+								header, err := l1Client.HeaderByNumber(egCtx, big.NewInt(int64(log.BlockNumber)))
+								if err != nil {
+									return fmt.Errorf("failed to get header: %w", err)
+								}
+								blockTimes[log.BlockNumber] = header.Time
+							}
+						}
+
+						// Get block time for the latest block
+						toBlockHeader, err := l1Client.HeaderByNumber(egCtx, big.NewInt(int64(toBlock)))
+						if err != nil {
+							return fmt.Errorf("failed to get header for toBlock: %w", err)
+						}
+						toBlockTime := int64(toBlockHeader.Time)
+
+						// Start a transaction
+						tx, err := db.Begin()
+						if err != nil {
+							return fmt.Errorf("failed to begin transaction: %w", err)
+						}
+
+						txStore := sqlitestore.New(tx).WithTx(tx)
+
+						defer func() {
+							if err != nil {
+								tx.Rollback()
+							}
+						}()
+
+						for _, lg := range logs {
+							// Parse the event data
+							event, err := logparser.ParseL1StandardBridgeETHDepositInitiatedEvent(&lg)
+							if err != nil {
+								return fmt.Errorf("failed to parse log: %w", err)
+							}
+
+							eventJSON, err := json.Marshal(lg)
+							if err != nil {
+								return fmt.Errorf("failed to marshal event: %w", err)
+							}
+
+							// Insert log data into database and get the ID
+							lastInsertID, err := txStore.InsertL1StandardBridgeETHDepositInitiated(egCtx, sqlitestore.InsertL1StandardBridgeETHDepositInitiatedParams{
+								BlockNumber:    int64(lg.BlockNumber),
+								BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+								TxHash:         lg.TxHash.Bytes(),
+								FromAddress:    event.From.Bytes(),
+								ToAddress:      event.To.Bytes(),
+								Amount:         weiToEth(event.Amount),
+								Event:          eventJSON,
+								MatchingHash:   event.DepositMatchingHash().Bytes(),
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to insert log: %w", err)
+							}
+
+							// Find matching L2 deposit finalized event
+							matchingL2Deposits, err := txStore.FindMatchingL2Deposits(egCtx, sqlitestore.FindMatchingL2DepositsParams{
+								MatchingHash:   event.DepositMatchingHash().Bytes(),
+								BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to find matching L2 deposits: %w", err)
+							}
+
+							// If we found a matching L2 deposit, update the match
+							if len(matchingL2Deposits) > 0 {
+								match := matchingL2Deposits[0]
+
+								// Update the L2 deposit with the L1 deposit ID
+								err = txStore.UpdateL2DepositWithMatch(egCtx, sqlitestore.UpdateL2DepositWithMatchParams{
+									MatchedL1StandardBridgeEthDepositInitiatedID: &lastInsertID,
+									ID: match.ID,
+								})
+								if err != nil {
+									tx.Rollback()
+									return fmt.Errorf("failed to update L2 deposit with match: %w", err)
+								}
+
+								// Update the L1 deposit with the L2 deposit ID
+								matchedID := match.ID
+								err = txStore.UpdateL1DepositWithMatch(egCtx, sqlitestore.UpdateL1DepositWithMatchParams{
+									MatchedL2StandardBridgeDepositFinalizedID: &matchedID,
+									ID: lastInsertID,
+								})
+								if err != nil {
+									tx.Rollback()
+									return fmt.Errorf("failed to update L1 deposit with match: %w", err)
+								}
+
+								log.Info("matched deposits",
+									"l1_deposit_id", lastInsertID,
+									"l2_deposit_id", match.ID,
+									"time_difference_seconds", match.BlockTimestamp-int64(blockTimes[lg.BlockNumber]))
+							}
+						}
+
+						if len(logs) > 0 {
+							log.Info("processed logs", "count", len(logs))
+						}
+
+						// Update the last processed block pointer
+						toBlockNumber := int64(toBlock)
+						err = txStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
+							BlockNumber: &toBlockNumber,
+							BlockTime:   &toBlockTime,
+							Name:        L1_ETH_DEPOSIT_INITIATED_LAST_BLOCK,
+						})
+						if err != nil {
+							tx.Rollback()
+							return fmt.Errorf("failed to update last block pointer: %w", err)
+						}
+
+						// Commit the transaction
+						err = tx.Commit()
+						if err != nil {
+							return fmt.Errorf("failed to commit transaction: %w", err)
+						}
+
+						// If we've reached the head, wait for the next polling interval
+						if toBlock == headBlock {
+							log.Info("reached head block, waiting for next poll", "head_block", headBlock)
+						}
+					}
+				}
+			})
+
+			// Forward filling for L2
+			eg.Go(func() error {
+				log := log.With("chain", "l2", "mode", "forward")
+
+				sleepDuration := cfg.l2BlockInterval
+				pollTicker := time.NewTicker(sleepDuration)
+				defer pollTicker.Stop()
+
+				for {
+					select {
+					case <-egCtx.Done():
+						return egCtx.Err()
+					case <-pollTicker.C:
+						log.Info("forward filling", "sleep_duration", sleepDuration)
+						// Get the last processed block
+						lastProcessedBlock, err := autocommitStore.GetBlockPointer(egCtx, L2_ETH_DEPOSIT_FINALIZED_LAST_BLOCK)
+						if err != nil {
+							return fmt.Errorf("failed to get last processed block: %w", err)
+						}
+
+						var fromBlock uint64
+						if lastProcessedBlock.BlockNumber != nil {
+							fromBlock = uint64(*lastProcessedBlock.BlockNumber) + 1
+						} else {
+							// If last processed block is nil, get the current block and start from there
+							currentBlock, err := l2Client.BlockNumber(egCtx)
+							if err != nil {
+								return fmt.Errorf("failed to get current block number: %w", err)
+							}
+							fromBlock = currentBlock
+						}
+
+						// Get the current head block
+						headBlock, err := l2Client.BlockNumber(egCtx)
+						if err != nil {
+							return fmt.Errorf("failed to get current block number: %w", err)
+						}
+
+						// If we're already at the head, skip this iteration
+						if fromBlock > headBlock {
+							log.Info("already at head, skipping", "from_block", fromBlock, "head_block", headBlock)
+							continue
+						}
+
+						// Process blocks in chunks of max 100
+						toBlock := fromBlock + 99
+						if toBlock > headBlock {
+							toBlock = headBlock
+						}
+
+						log.Info("forward filling", "from_block", fromBlock, "to_block", toBlock)
+
+						logs, err := l2Client.FilterLogs(egCtx, ethereum.FilterQuery{
+							Addresses: []common.Address{l2StandardBridgeAddress},
+							Topics:    [][]common.Hash{{ethDepositFinalizedEvent}},
+							FromBlock: big.NewInt(int64(fromBlock)),
+							ToBlock:   big.NewInt(int64(toBlock)),
+						})
+						if err != nil {
+							return fmt.Errorf("failed to filter logs: %w", err)
+						}
+
+						// Get block times for each block with events
+						blockTimes := make(map[uint64]uint64)
+						for _, log := range logs {
+							if _, exists := blockTimes[log.BlockNumber]; !exists {
+								header, err := l2Client.HeaderByNumber(egCtx, big.NewInt(int64(log.BlockNumber)))
+								if err != nil {
+									return fmt.Errorf("failed to get header: %w", err)
+								}
+								blockTimes[log.BlockNumber] = header.Time
+							}
+						}
+
+						// Get block time for the latest block
+						toBlockHeader, err := l2Client.HeaderByNumber(egCtx, big.NewInt(int64(toBlock)))
+						if err != nil {
+							return fmt.Errorf("failed to get header for toBlock: %w", err)
+						}
+						toBlockTime := int64(toBlockHeader.Time)
+
+						// Start a transaction
+						tx, err := db.Begin()
+						if err != nil {
+							return fmt.Errorf("failed to begin transaction: %w", err)
+						}
+
+						txStore := sqlitestore.New(tx).WithTx(tx)
+
+						defer func() {
+							if err != nil {
+								tx.Rollback()
+							}
+						}()
+
+						for _, lg := range logs {
+							// Parse the event data
+							event, err := logparser.ParseL2StandardBridgeDepositFinalizedEvent(&lg)
+							if err != nil {
+								return fmt.Errorf("failed to parse log: %w", err)
+							}
+
+							eventJSON, err := json.Marshal(lg)
+							if err != nil {
+								return fmt.Errorf("failed to marshal event: %w", err)
+							}
+
+							// Insert log data into database and get the ID
+							l2DepositID, err := txStore.InsertL2StandardBridgeDepositFinalized(egCtx, sqlitestore.InsertL2StandardBridgeDepositFinalizedParams{
+								BlockNumber:    int64(lg.BlockNumber),
+								BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+								TxHash:         lg.TxHash.Bytes(),
+								FromAddress:    event.From.Bytes(),
+								ToAddress:      event.To.Bytes(),
+								L1Token:        event.L1Token.Bytes(),
+								Amount:         weiToEth(event.Amount),
+								Event:          eventJSON,
+								MatchingHash:   event.DepositMatchingHash().Bytes(),
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to insert log: %w", err)
+							}
+
+							// Find matching L1 deposit initiated event
+							matchingL1Deposits, err := txStore.FindMatchingL1Deposits(egCtx, sqlitestore.FindMatchingL1DepositsParams{
+								MatchingHash:   event.DepositMatchingHash().Bytes(),
+								BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to find matching L1 deposits: %w", err)
+							}
+
+							// If we found a matching L1 deposit, update the match
+							if len(matchingL1Deposits) > 0 {
+								match := matchingL1Deposits[0]
+
+								// Update the L1 deposit with the L2 deposit ID
+								l2ID := l2DepositID
+								err = txStore.UpdateL1DepositWithMatch(egCtx, sqlitestore.UpdateL1DepositWithMatchParams{
+									MatchedL2StandardBridgeDepositFinalizedID: &l2ID,
+									ID: match.ID,
+								})
+								if err != nil {
+									tx.Rollback()
+									return fmt.Errorf("failed to update L1 deposit with match: %w", err)
+								}
+
+								// Update the L2 deposit with the L1 deposit ID
+								err = txStore.UpdateL2DepositWithMatch(egCtx, sqlitestore.UpdateL2DepositWithMatchParams{
+									MatchedL1StandardBridgeEthDepositInitiatedID: &match.ID,
+									ID: l2DepositID,
+								})
+								if err != nil {
+									tx.Rollback()
+									return fmt.Errorf("failed to update L2 deposit with match: %w", err)
+								}
+
+								log.Info("matched deposits",
+									"l1_deposit_id", match.ID,
+									"l2_deposit_id", l2DepositID,
+									"time_difference_seconds", int64(blockTimes[lg.BlockNumber])-match.BlockTimestamp)
+							}
+						}
+
+						if len(logs) > 0 {
+							log.Info("processed logs", "count", len(logs))
+						}
+
+						// Update the last processed block pointer
+						toBlockNumber := int64(toBlock)
+						err = txStore.UpdateBlockPointer(egCtx, sqlitestore.UpdateBlockPointerParams{
+							BlockNumber: &toBlockNumber,
+							BlockTime:   &toBlockTime,
+							Name:        L2_ETH_DEPOSIT_FINALIZED_LAST_BLOCK,
+						})
+						if err != nil {
+							tx.Rollback()
+							return fmt.Errorf("failed to update last block pointer: %w", err)
+						}
+
+						// Commit the transaction
+						err = tx.Commit()
+						if err != nil {
+							return fmt.Errorf("failed to commit transaction: %w", err)
+						}
+
+						// If we've reached the head, wait for the next polling interval
+						if toBlock == headBlock {
+							log.Info("reached head block, waiting for next poll", "head_block", headBlock)
+						}
+					}
+				}
+			})
+
+			// Add web UI server
+			webServer := webui.NewServer(db, log.With("component", "webui"), cfg.webUIAddr)
+			eg.Go(func() error {
+				return webServer.Start(egCtx)
+			})
+
 			return eg.Wait()
 		},
 	}
