@@ -11,6 +11,7 @@ import (
 
 	"github.com/Golem-Base/bridgette/pkg/logparser"
 	"github.com/Golem-Base/bridgette/pkg/sqlitestore"
+	"github.com/Golem-Base/bridgette/pkg/webui"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -64,6 +65,7 @@ func main() {
 		dbURL           string
 		addr            string
 		l1BridgeAddress string
+		webUIAddr       string
 	}{}
 
 	app := &cli.App{
@@ -104,6 +106,13 @@ func main() {
 				EnvVars:     []string{"L1_BRIDGE_ADDRESS"},
 				Value:       "0x54d6c1435ac7b90a5d46d01ee2f22ed6ff270ed3",
 				Destination: &cfg.l1BridgeAddress,
+			},
+			&cli.StringFlag{
+				Name:        "web-ui-addr",
+				Usage:       "Address for the web UI",
+				EnvVars:     []string{"WEB_UI_ADDR"},
+				Value:       ":8085",
+				Destination: &cfg.webUIAddr,
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -167,6 +176,12 @@ func main() {
 			autocommitStore := sqlitestore.New(db)
 
 			eg, egCtx := errgroup.WithContext(ctx)
+
+			// Add web UI server
+			webServer := webui.NewServer(db, log.With("component", "webui"), cfg.webUIAddr)
+			eg.Go(func() error {
+				return webServer.Start(egCtx)
+			})
 
 			eg.Go(func() error {
 
