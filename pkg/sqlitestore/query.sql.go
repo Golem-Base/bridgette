@@ -9,6 +9,102 @@ import (
 	"context"
 )
 
+const findMatchingL1Deposits = `-- name: FindMatchingL1Deposits :many
+SELECT 
+    id,
+    block_timestamp,
+    matching_hash
+FROM l1_standard_bridge_eth_deposit_initiated
+WHERE 
+    matching_hash = ? AND
+    block_timestamp <= ? AND
+    matched_l2_standard_bridge_deposit_finalized_id IS NULL
+ORDER BY block_timestamp DESC
+LIMIT 1
+`
+
+type FindMatchingL1DepositsParams struct {
+	MatchingHash   []byte
+	BlockTimestamp int64
+}
+
+type FindMatchingL1DepositsRow struct {
+	ID             int64
+	BlockTimestamp int64
+	MatchingHash   []byte
+}
+
+func (q *Queries) FindMatchingL1Deposits(ctx context.Context, arg FindMatchingL1DepositsParams) ([]FindMatchingL1DepositsRow, error) {
+	rows, err := q.query(ctx, q.findMatchingL1DepositsStmt, findMatchingL1Deposits, arg.MatchingHash, arg.BlockTimestamp)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindMatchingL1DepositsRow
+	for rows.Next() {
+		var i FindMatchingL1DepositsRow
+		if err := rows.Scan(&i.ID, &i.BlockTimestamp, &i.MatchingHash); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const findMatchingL2Deposits = `-- name: FindMatchingL2Deposits :many
+SELECT 
+    id,
+    block_timestamp,
+    matching_hash
+FROM l2_standard_bridge_deposit_finalized
+WHERE 
+    matching_hash = ? AND
+    block_timestamp >= ? AND
+    matched_l1_standard_bridge_eth_deposit_initiated_id IS NULL
+ORDER BY block_timestamp ASC
+LIMIT 1
+`
+
+type FindMatchingL2DepositsParams struct {
+	MatchingHash   []byte
+	BlockTimestamp int64
+}
+
+type FindMatchingL2DepositsRow struct {
+	ID             int64
+	BlockTimestamp int64
+	MatchingHash   []byte
+}
+
+func (q *Queries) FindMatchingL2Deposits(ctx context.Context, arg FindMatchingL2DepositsParams) ([]FindMatchingL2DepositsRow, error) {
+	rows, err := q.query(ctx, q.findMatchingL2DepositsStmt, findMatchingL2Deposits, arg.MatchingHash, arg.BlockTimestamp)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindMatchingL2DepositsRow
+	for rows.Next() {
+		var i FindMatchingL2DepositsRow
+		if err := rows.Scan(&i.ID, &i.BlockTimestamp, &i.MatchingHash); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getBlockPointer = `-- name: GetBlockPointer :one
 SELECT block_number FROM BLOCK_POINTERS WHERE name = ? LIMIT 1
 `
@@ -20,7 +116,7 @@ func (q *Queries) GetBlockPointer(ctx context.Context, name string) (*int64, err
 	return block_number, err
 }
 
-const insertL1StandardBridgeETHDepositInitiated = `-- name: InsertL1StandardBridgeETHDepositInitiated :exec
+const insertL1StandardBridgeETHDepositInitiated = `-- name: InsertL1StandardBridgeETHDepositInitiated :one
 INSERT INTO l1_standard_bridge_eth_deposit_initiated (
     block_number,
     block_timestamp,
@@ -39,7 +135,7 @@ INSERT INTO l1_standard_bridge_eth_deposit_initiated (
     ?,
     ?,
     ?
-)
+) RETURNING id
 `
 
 type InsertL1StandardBridgeETHDepositInitiatedParams struct {
@@ -53,8 +149,8 @@ type InsertL1StandardBridgeETHDepositInitiatedParams struct {
 	MatchingHash   []byte
 }
 
-func (q *Queries) InsertL1StandardBridgeETHDepositInitiated(ctx context.Context, arg InsertL1StandardBridgeETHDepositInitiatedParams) error {
-	_, err := q.exec(ctx, q.insertL1StandardBridgeETHDepositInitiatedStmt, insertL1StandardBridgeETHDepositInitiated,
+func (q *Queries) InsertL1StandardBridgeETHDepositInitiated(ctx context.Context, arg InsertL1StandardBridgeETHDepositInitiatedParams) (int64, error) {
+	row := q.queryRow(ctx, q.insertL1StandardBridgeETHDepositInitiatedStmt, insertL1StandardBridgeETHDepositInitiated,
 		arg.BlockNumber,
 		arg.BlockTimestamp,
 		arg.TxHash,
@@ -64,10 +160,12 @@ func (q *Queries) InsertL1StandardBridgeETHDepositInitiated(ctx context.Context,
 		arg.Event,
 		arg.MatchingHash,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
-const insertL2StandardBridgeDepositFinalized = `-- name: InsertL2StandardBridgeDepositFinalized :exec
+const insertL2StandardBridgeDepositFinalized = `-- name: InsertL2StandardBridgeDepositFinalized :one
 INSERT INTO l2_standard_bridge_deposit_finalized (
     block_number,
     block_timestamp,
@@ -88,7 +186,7 @@ INSERT INTO l2_standard_bridge_deposit_finalized (
     ?,
     ?,
     ?
-)
+) RETURNING id
 `
 
 type InsertL2StandardBridgeDepositFinalizedParams struct {
@@ -103,8 +201,8 @@ type InsertL2StandardBridgeDepositFinalizedParams struct {
 	MatchingHash   []byte
 }
 
-func (q *Queries) InsertL2StandardBridgeDepositFinalized(ctx context.Context, arg InsertL2StandardBridgeDepositFinalizedParams) error {
-	_, err := q.exec(ctx, q.insertL2StandardBridgeDepositFinalizedStmt, insertL2StandardBridgeDepositFinalized,
+func (q *Queries) InsertL2StandardBridgeDepositFinalized(ctx context.Context, arg InsertL2StandardBridgeDepositFinalizedParams) (int64, error) {
+	row := q.queryRow(ctx, q.insertL2StandardBridgeDepositFinalizedStmt, insertL2StandardBridgeDepositFinalized,
 		arg.BlockNumber,
 		arg.BlockTimestamp,
 		arg.TxHash,
@@ -115,7 +213,9 @@ func (q *Queries) InsertL2StandardBridgeDepositFinalized(ctx context.Context, ar
 		arg.Event,
 		arg.MatchingHash,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const updateBlockPointer = `-- name: UpdateBlockPointer :exec
@@ -129,5 +229,41 @@ type UpdateBlockPointerParams struct {
 
 func (q *Queries) UpdateBlockPointer(ctx context.Context, arg UpdateBlockPointerParams) error {
 	_, err := q.exec(ctx, q.updateBlockPointerStmt, updateBlockPointer, arg.BlockNumber, arg.Name)
+	return err
+}
+
+const updateL1DepositWithMatch = `-- name: UpdateL1DepositWithMatch :exec
+UPDATE l1_standard_bridge_eth_deposit_initiated
+SET 
+    matched_l2_standard_bridge_deposit_finalized_id = ?,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = ?
+`
+
+type UpdateL1DepositWithMatchParams struct {
+	MatchedL2StandardBridgeDepositFinalizedID *int64
+	ID                                        int64
+}
+
+func (q *Queries) UpdateL1DepositWithMatch(ctx context.Context, arg UpdateL1DepositWithMatchParams) error {
+	_, err := q.exec(ctx, q.updateL1DepositWithMatchStmt, updateL1DepositWithMatch, arg.MatchedL2StandardBridgeDepositFinalizedID, arg.ID)
+	return err
+}
+
+const updateL2DepositWithMatch = `-- name: UpdateL2DepositWithMatch :exec
+UPDATE l2_standard_bridge_deposit_finalized
+SET 
+    matched_l1_standard_bridge_eth_deposit_initiated_id = ?,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = ?
+`
+
+type UpdateL2DepositWithMatchParams struct {
+	MatchedL1StandardBridgeEthDepositInitiatedID *int64
+	ID                                           int64
+}
+
+func (q *Queries) UpdateL2DepositWithMatch(ctx context.Context, arg UpdateL2DepositWithMatchParams) error {
+	_, err := q.exec(ctx, q.updateL2DepositWithMatchStmt, updateL2DepositWithMatch, arg.MatchedL1StandardBridgeEthDepositInitiatedID, arg.ID)
 	return err
 }

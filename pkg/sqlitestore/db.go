@@ -24,6 +24,12 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.findMatchingL1DepositsStmt, err = db.PrepareContext(ctx, findMatchingL1Deposits); err != nil {
+		return nil, fmt.Errorf("error preparing query FindMatchingL1Deposits: %w", err)
+	}
+	if q.findMatchingL2DepositsStmt, err = db.PrepareContext(ctx, findMatchingL2Deposits); err != nil {
+		return nil, fmt.Errorf("error preparing query FindMatchingL2Deposits: %w", err)
+	}
 	if q.getBlockPointerStmt, err = db.PrepareContext(ctx, getBlockPointer); err != nil {
 		return nil, fmt.Errorf("error preparing query GetBlockPointer: %w", err)
 	}
@@ -36,11 +42,27 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateBlockPointerStmt, err = db.PrepareContext(ctx, updateBlockPointer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateBlockPointer: %w", err)
 	}
+	if q.updateL1DepositWithMatchStmt, err = db.PrepareContext(ctx, updateL1DepositWithMatch); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateL1DepositWithMatch: %w", err)
+	}
+	if q.updateL2DepositWithMatchStmt, err = db.PrepareContext(ctx, updateL2DepositWithMatch); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateL2DepositWithMatch: %w", err)
+	}
 	return &q, nil
 }
 
 func (q *Queries) Close() error {
 	var err error
+	if q.findMatchingL1DepositsStmt != nil {
+		if cerr := q.findMatchingL1DepositsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findMatchingL1DepositsStmt: %w", cerr)
+		}
+	}
+	if q.findMatchingL2DepositsStmt != nil {
+		if cerr := q.findMatchingL2DepositsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findMatchingL2DepositsStmt: %w", cerr)
+		}
+	}
 	if q.getBlockPointerStmt != nil {
 		if cerr := q.getBlockPointerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getBlockPointerStmt: %w", cerr)
@@ -59,6 +81,16 @@ func (q *Queries) Close() error {
 	if q.updateBlockPointerStmt != nil {
 		if cerr := q.updateBlockPointerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateBlockPointerStmt: %w", cerr)
+		}
+	}
+	if q.updateL1DepositWithMatchStmt != nil {
+		if cerr := q.updateL1DepositWithMatchStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateL1DepositWithMatchStmt: %w", cerr)
+		}
+	}
+	if q.updateL2DepositWithMatchStmt != nil {
+		if cerr := q.updateL2DepositWithMatchStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateL2DepositWithMatchStmt: %w", cerr)
 		}
 	}
 	return err
@@ -100,19 +132,27 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                                            DBTX
 	tx                                            *sql.Tx
+	findMatchingL1DepositsStmt                    *sql.Stmt
+	findMatchingL2DepositsStmt                    *sql.Stmt
 	getBlockPointerStmt                           *sql.Stmt
 	insertL1StandardBridgeETHDepositInitiatedStmt *sql.Stmt
 	insertL2StandardBridgeDepositFinalizedStmt    *sql.Stmt
 	updateBlockPointerStmt                        *sql.Stmt
+	updateL1DepositWithMatchStmt                  *sql.Stmt
+	updateL2DepositWithMatchStmt                  *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                  tx,
-		tx:                  tx,
-		getBlockPointerStmt: q.getBlockPointerStmt,
+		db:                         tx,
+		tx:                         tx,
+		findMatchingL1DepositsStmt: q.findMatchingL1DepositsStmt,
+		findMatchingL2DepositsStmt: q.findMatchingL2DepositsStmt,
+		getBlockPointerStmt:        q.getBlockPointerStmt,
 		insertL1StandardBridgeETHDepositInitiatedStmt: q.insertL1StandardBridgeETHDepositInitiatedStmt,
 		insertL2StandardBridgeDepositFinalizedStmt:    q.insertL2StandardBridgeDepositFinalizedStmt,
 		updateBlockPointerStmt:                        q.updateBlockPointerStmt,
+		updateL1DepositWithMatchStmt:                  q.updateL1DepositWithMatchStmt,
+		updateL2DepositWithMatchStmt:                  q.updateL2DepositWithMatchStmt,
 	}
 }

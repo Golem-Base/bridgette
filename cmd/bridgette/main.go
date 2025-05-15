@@ -233,23 +233,23 @@ func main() {
 						blockTimes[log.BlockNumber] = header.Time
 					}
 
-					for _, log := range logs {
+					for _, lg := range logs {
 						// Parse the event data
-						event, err := logparser.ParseL1StandardBridgeETHDepositInitiatedEvent(&log)
+						event, err := logparser.ParseL1StandardBridgeETHDepositInitiatedEvent(&lg)
 						if err != nil {
 							return fmt.Errorf("failed to parse log: %w", err)
 						}
 
-						eventJSON, err := json.Marshal(log)
+						eventJSON, err := json.Marshal(lg)
 						if err != nil {
 							return fmt.Errorf("failed to marshal event: %w", err)
 						}
 
-						// Insert log data into database
-						err = txStore.InsertL1StandardBridgeETHDepositInitiated(egCtx, sqlitestore.InsertL1StandardBridgeETHDepositInitiatedParams{
-							BlockNumber:    int64(log.BlockNumber),
-							BlockTimestamp: int64(blockTimes[log.BlockNumber]),
-							TxHash:         log.TxHash.Bytes(),
+						// Insert log data into database and get the ID directly
+						lastInsertID, err := txStore.InsertL1StandardBridgeETHDepositInitiated(egCtx, sqlitestore.InsertL1StandardBridgeETHDepositInitiatedParams{
+							BlockNumber:    int64(lg.BlockNumber),
+							BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+							TxHash:         lg.TxHash.Bytes(),
 							FromAddress:    event.From.Bytes(),
 							ToAddress:      event.To.Bytes(),
 							Amount:         weiToEth(event.Amount), // Convert Wei to ETH
@@ -259,6 +259,53 @@ func main() {
 						if err != nil {
 							tx.Rollback()
 							return fmt.Errorf("failed to insert log: %w", err)
+						}
+
+						// Find matching L2 deposit finalized event
+						// Matching criteria:
+						// 1. Matching hash must match
+						// 2. L2 event timestamp must be >= L1 event timestamp (happened at same time or later)
+						// 3. L2 event must not be already matched
+						// We order by timestamp to get the earliest matching L2 event (lowest time difference)
+						matchingL2Deposits, err := txStore.FindMatchingL2Deposits(egCtx, sqlitestore.FindMatchingL2DepositsParams{
+							MatchingHash:   event.DepositMatchingHash().Bytes(),
+							BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+						})
+						if err != nil {
+							tx.Rollback()
+							return fmt.Errorf("failed to find matching L2 deposits: %w", err)
+						}
+
+						// If we found a matching L2 deposit, update the match
+						if len(matchingL2Deposits) > 0 {
+							match := matchingL2Deposits[0]
+
+							// Update the L2 deposit with the L1 deposit ID
+							err = txStore.UpdateL2DepositWithMatch(egCtx, sqlitestore.UpdateL2DepositWithMatchParams{
+								MatchedL1StandardBridgeEthDepositInitiatedID: &lastInsertID,
+								ID: match.ID,
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to update L2 deposit with match: %w", err)
+							}
+
+							// Update the L1 deposit with the L2 deposit ID
+							matchedID := match.ID // Create a variable to get a pointer
+							err = txStore.UpdateL1DepositWithMatch(egCtx, sqlitestore.UpdateL1DepositWithMatchParams{
+								MatchedL2StandardBridgeDepositFinalizedID: &matchedID,
+								ID: lastInsertID,
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to update L1 deposit with match: %w", err)
+							}
+
+							// Use the correct log variable
+							log.Info("matched deposits",
+								"l1_deposit_id", lastInsertID,
+								"l2_deposit_id", match.ID,
+								"time_difference_seconds", match.BlockTimestamp-int64(blockTimes[lg.BlockNumber]))
 						}
 					}
 
@@ -354,23 +401,23 @@ func main() {
 						blockTimes[log.BlockNumber] = header.Time
 					}
 
-					for _, log := range logs {
+					for _, lg := range logs {
 
-						event, err := logparser.ParseL2StandardBridgeDepositFinalizedEvent(&log)
+						event, err := logparser.ParseL2StandardBridgeDepositFinalizedEvent(&lg)
 						if err != nil {
 							return fmt.Errorf("failed to parse log: %w", err)
 						}
 
-						eventJSON, err := json.Marshal(log)
+						eventJSON, err := json.Marshal(lg)
 						if err != nil {
 							return fmt.Errorf("failed to marshal event: %w", err)
 						}
 
 						// Insert log data into database instead of file
-						err = txStore.InsertL2StandardBridgeDepositFinalized(egCtx, sqlitestore.InsertL2StandardBridgeDepositFinalizedParams{
-							BlockNumber:    int64(log.BlockNumber),
-							BlockTimestamp: int64(blockTimes[log.BlockNumber]),
-							TxHash:         log.TxHash.Bytes(),
+						l2DepositID, err := txStore.InsertL2StandardBridgeDepositFinalized(egCtx, sqlitestore.InsertL2StandardBridgeDepositFinalizedParams{
+							BlockNumber:    int64(lg.BlockNumber),
+							BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+							TxHash:         lg.TxHash.Bytes(),
 							FromAddress:    event.From.Bytes(),
 							ToAddress:      event.To.Bytes(),
 							L1Token:        event.L1Token.Bytes(),
@@ -381,6 +428,52 @@ func main() {
 						if err != nil {
 							tx.Rollback()
 							return fmt.Errorf("failed to insert log: %w", err)
+						}
+
+						// Find matching L1 deposit initiated event
+						// Matching criteria:
+						// 1. Matching hash must match
+						// 2. L1 event timestamp must be <= L2 event timestamp (happened before or at the same time)
+						// 3. L1 event must not be already matched
+						// We order by timestamp DESC to get the latest matching L1 event (lowest time difference)
+						matchingL1Deposits, err := txStore.FindMatchingL1Deposits(egCtx, sqlitestore.FindMatchingL1DepositsParams{
+							MatchingHash:   event.DepositMatchingHash().Bytes(),
+							BlockTimestamp: int64(blockTimes[lg.BlockNumber]),
+						})
+						if err != nil {
+							tx.Rollback()
+							return fmt.Errorf("failed to find matching L1 deposits: %w", err)
+						}
+
+						// If we found a matching L1 deposit, update the match
+						if len(matchingL1Deposits) > 0 {
+							match := matchingL1Deposits[0]
+
+							// Update the L1 deposit with the L2 deposit ID
+							l2ID := l2DepositID // Create a variable to get a pointer
+							err = txStore.UpdateL1DepositWithMatch(egCtx, sqlitestore.UpdateL1DepositWithMatchParams{
+								MatchedL2StandardBridgeDepositFinalizedID: &l2ID,
+								ID: match.ID,
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to update L1 deposit with match: %w", err)
+							}
+
+							// Update the L2 deposit with the L1 deposit ID
+							err = txStore.UpdateL2DepositWithMatch(egCtx, sqlitestore.UpdateL2DepositWithMatchParams{
+								MatchedL1StandardBridgeEthDepositInitiatedID: &match.ID,
+								ID: l2DepositID,
+							})
+							if err != nil {
+								tx.Rollback()
+								return fmt.Errorf("failed to update L2 deposit with match: %w", err)
+							}
+
+							log.Info("matched deposits (from L2)",
+								"l1_deposit_id", match.ID,
+								"l2_deposit_id", l2DepositID,
+								"time_difference_seconds", int64(blockTimes[lg.BlockNumber])-match.BlockTimestamp)
 						}
 					}
 
