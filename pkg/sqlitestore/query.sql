@@ -166,3 +166,29 @@ WHERE
     name = 'l2_standard_bridge_eth_deposit_finalized_last_processed_block'
 LIMIT 1;
 
+-- name: GetUnmatchedDeposits :many
+SELECT 
+    id,
+    from_address,
+    to_address,
+    amount,
+    block_number as l1_block_number,
+    block_timestamp as l1_timestamp,
+    tx_hash as tx_hash_l1,
+    (strftime('%s', 'now') - block_timestamp) as time_since_seconds
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+WHERE 
+    matched_l2_standard_bridge_deposit_finalized_id IS NULL
+ORDER BY 
+    block_timestamp DESC
+LIMIT ? OFFSET ?;
+
+-- name: GetTotalUnmatchedDeposits :one
+SELECT 
+    COUNT(*) 
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+WHERE 
+    matched_l2_standard_bridge_deposit_finalized_id IS NULL;
+

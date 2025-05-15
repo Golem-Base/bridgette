@@ -315,6 +315,89 @@ func (q *Queries) GetTotalMatchedDeposits(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const getTotalUnmatchedDeposits = `-- name: GetTotalUnmatchedDeposits :one
+SELECT 
+    COUNT(*) 
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+WHERE 
+    matched_l2_standard_bridge_deposit_finalized_id IS NULL
+`
+
+func (q *Queries) GetTotalUnmatchedDeposits(ctx context.Context) (int64, error) {
+	row := q.queryRow(ctx, q.getTotalUnmatchedDepositsStmt, getTotalUnmatchedDeposits)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getUnmatchedDeposits = `-- name: GetUnmatchedDeposits :many
+SELECT 
+    id,
+    from_address,
+    to_address,
+    amount,
+    block_number as l1_block_number,
+    block_timestamp as l1_timestamp,
+    tx_hash as tx_hash_l1,
+    (strftime('%s', 'now') - block_timestamp) as time_since_seconds
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+WHERE 
+    matched_l2_standard_bridge_deposit_finalized_id IS NULL
+ORDER BY 
+    block_timestamp DESC
+LIMIT ? OFFSET ?
+`
+
+type GetUnmatchedDepositsParams struct {
+	Limit  int64
+	Offset int64
+}
+
+type GetUnmatchedDepositsRow struct {
+	ID               int64
+	FromAddress      []byte
+	ToAddress        []byte
+	Amount           float64
+	L1BlockNumber    int64
+	L1Timestamp      int64
+	TxHashL1         []byte
+	TimeSinceSeconds interface{}
+}
+
+func (q *Queries) GetUnmatchedDeposits(ctx context.Context, arg GetUnmatchedDepositsParams) ([]GetUnmatchedDepositsRow, error) {
+	rows, err := q.query(ctx, q.getUnmatchedDepositsStmt, getUnmatchedDeposits, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUnmatchedDepositsRow
+	for rows.Next() {
+		var i GetUnmatchedDepositsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FromAddress,
+			&i.ToAddress,
+			&i.Amount,
+			&i.L1BlockNumber,
+			&i.L1Timestamp,
+			&i.TxHashL1,
+			&i.TimeSinceSeconds,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertL1StandardBridgeETHDepositInitiated = `-- name: InsertL1StandardBridgeETHDepositInitiated :one
 INSERT INTO l1_standard_bridge_eth_deposit_initiated (
     block_number,

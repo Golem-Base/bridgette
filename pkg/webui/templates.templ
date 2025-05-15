@@ -114,7 +114,11 @@ templ DashboardContent(stats map[string]interface{}) {
 				</div>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+				<div class="golem-card">
+					<h3 class="text-lg font-semibold mb-2 text-amber-600">Unmatched Deposits</h3>
+					<p class="text-3xl font-bold text-amber-600">{ fmt.Sprintf("%d", stats["pending_deposits"].(int)) }</p>
+				</div>
 				<div class="golem-card">
 					<h2 class="text-xl font-bold mb-4">Latest L1 Block</h2>
 					<div class="grid grid-cols-2 gap-4">
@@ -160,6 +164,16 @@ templ DashboardContent(stats map[string]interface{}) {
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+	
+	<div class="golem-card mb-8">
+		<div class="mb-6">
+			<h2 class="text-xl font-bold text-amber-600">Unmatched Deposits</h2>
+			<p class="text-sm text-gray-600">Deposits waiting for L2 confirmation</p>
+		</div>
+		<div id="unmatched-deposits-wrapper">
+			<div id="unmatched-deposits-container" hx-get="/unmatched-deposits" hx-trigger="load delay:200ms, every 2s" hx-swap="morphdom"></div>
 		</div>
 	</div>
 	
@@ -252,6 +266,76 @@ templ DepositItem(deposit DepositPair) {
 						Tx: { shortenAddress(deposit.TxHashL2) }
 					</a>
 				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// UnmatchedDepositsList displays a list of unmatched deposits
+templ UnmatchedDepositsList(deposits []UnmatchedDeposit, page, totalPages int) {
+	<div class="timeline-container">
+		if len(deposits) == 0 {
+			<p class="text-center py-6 text-gray-500">No unmatched deposits found</p>
+		} else {
+			for _, deposit := range deposits {
+				@UnmatchedDepositItem(deposit)
+			}
+		}
+	</div>
+	
+	if totalPages > 1 {
+		<div class="flex justify-between items-center mt-6">
+			<div>
+				<span class="text-sm text-gray-600">Page { fmt.Sprintf("%d of %d", page, totalPages) }</span>
+			</div>
+			<div class="flex space-x-2">
+				if page > 1 {
+					<button 
+						class="golem-button" 
+						hx-get={ fmt.Sprintf("/unmatched-deposits?page=%d", page-1) } 
+						hx-target="#unmatched-deposits-container" 
+						hx-swap="morphdom"
+					>
+						Previous
+					</button>
+				}
+				if page < totalPages {
+					<button 
+						class="golem-button" 
+						hx-get={ fmt.Sprintf("/unmatched-deposits?page=%d", page+1) } 
+						hx-target="#unmatched-deposits-container" 
+						hx-swap="morphdom"
+					>
+						Next
+					</button>
+				}
+			</div>
+		</div>
+	}
+}
+
+// UnmatchedDepositItem displays a single unmatched deposit
+templ UnmatchedDepositItem(deposit UnmatchedDeposit) {
+	<div class="timeline-item">
+		<div class="golem-card border-l-4 border-amber-500">
+			<div class="flex justify-between items-start mb-4">
+				<div>
+					<h3 class="text-lg font-semibold">{ fmt.Sprintf("%.4f ETH", deposit.Amount) }</h3>
+					<p class="text-sm text-gray-600">From: { shortenAddress(deposit.FromAddress) }</p>
+					<p class="text-sm text-gray-600">To: { shortenAddress(deposit.ToAddress) }</p>
+				</div>
+				<div class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
+					Waiting: { formatTimeDiff(deposit.TimeSinceSeconds) }
+				</div>
+			</div>
+			
+			<div>
+				<h4 class="text-xs font-medium text-gray-500 uppercase mb-1">L1 Deposit</h4>
+				<p class="text-sm">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
+				<p class="text-sm">Time: { formatTime(deposit.L1Timestamp) }</p>
+				<a href={ etherscanURL(deposit.TxHashL1) } target="_blank" class="text-sm text-blue-600 hover:underline">
+					Tx: { shortenAddress(deposit.TxHashL1) }
+				</a>
 			</div>
 		</div>
 	</div>

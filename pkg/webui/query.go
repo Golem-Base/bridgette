@@ -24,6 +24,18 @@ type DepositPair struct {
 	TxHashL2        string
 }
 
+// UnmatchedDeposit represents an unmatched L1 deposit event
+type UnmatchedDeposit struct {
+	ID               int64
+	FromAddress      string
+	ToAddress        string
+	Amount           float64
+	L1BlockNumber    int64
+	L1Timestamp      time.Time
+	TimeSinceSeconds int64
+	TxHashL1         string
+}
+
 // GetMatchedDeposits returns a list of matched deposit pairs with time difference information
 func GetMatchedDeposits(ctx context.Context, db *sql.DB, limit, offset int) ([]DepositPair, error) {
 	queries := sqlitestore.New(db)
@@ -73,6 +85,59 @@ func GetTotalMatchedDeposits(ctx context.Context, db *sql.DB) (int, error) {
 	queries := sqlitestore.New(db)
 
 	count, err := queries.GetTotalMatchedDeposits(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(count), nil
+}
+
+// GetUnmatchedDeposits returns a list of unmatched L1 deposit events
+func GetUnmatchedDeposits(ctx context.Context, db *sql.DB, limit, offset int) ([]UnmatchedDeposit, error) {
+	queries := sqlitestore.New(db)
+
+	rows, err := queries.GetUnmatchedDeposits(ctx, sqlitestore.GetUnmatchedDepositsParams{
+		Limit:  int64(limit),
+		Offset: int64(offset),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var deposits []UnmatchedDeposit
+	for _, row := range rows {
+		// Convert TimeSinceSeconds from interface{} to int64
+		var timeSince int64
+		switch v := row.TimeSinceSeconds.(type) {
+		case int64:
+			timeSince = v
+		case float64:
+			timeSince = int64(v)
+		case nil:
+			timeSince = 0 // Default to 0 if null
+		}
+
+		deposit := UnmatchedDeposit{
+			ID:               row.ID,
+			FromAddress:      "0x" + hex.EncodeToString(row.FromAddress),
+			ToAddress:        "0x" + hex.EncodeToString(row.ToAddress),
+			Amount:           row.Amount,
+			L1BlockNumber:    row.L1BlockNumber,
+			L1Timestamp:      time.Unix(row.L1Timestamp, 0),
+			TimeSinceSeconds: timeSince,
+			TxHashL1:         "0x" + hex.EncodeToString(row.TxHashL1),
+		}
+		deposits = append(deposits, deposit)
+	}
+
+	return deposits, nil
+}
+
+// GetTotalUnmatchedDeposits returns the total number of unmatched deposits
+func GetTotalUnmatchedDeposits(ctx context.Context, db *sql.DB) (int, error) {
+	queries := sqlitestore.New(db)
+
+	count, err := queries.GetTotalUnmatchedDeposits(ctx)
 	if err != nil {
 		return 0, err
 	}

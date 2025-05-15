@@ -37,6 +37,7 @@ func (s *Server) Start(ctx context.Context) error {
 	// Register handlers
 	mux.HandleFunc("GET /", s.handleIndex)
 	mux.HandleFunc("GET /deposits", s.handleDeposits)
+	mux.HandleFunc("GET /unmatched-deposits", s.handleUnmatchedDeposits)
 	mux.HandleFunc("GET /dashboard", s.handleDashboard)
 
 	server := &http.Server{
@@ -112,6 +113,44 @@ func (s *Server) handleDeposits(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.logger.Error("failed to render deposits list", "error", err)
 		http.Error(w, "Failed to render deposits list", http.StatusInternalServerError)
+		return
+	}
+}
+
+// handleUnmatchedDeposits handles the unmatched deposits endpoint
+func (s *Server) handleUnmatchedDeposits(w http.ResponseWriter, r *http.Request) {
+	page := 1
+	pageStr := r.URL.Query().Get("page")
+	if pageStr != "" {
+		parsedPage, err := strconv.Atoi(pageStr)
+		if err == nil && parsedPage > 0 {
+			page = parsedPage
+		}
+	}
+
+	offset := (page - 1) * ItemsPerPage
+
+	deposits, err := GetUnmatchedDeposits(r.Context(), s.db, ItemsPerPage, offset)
+	if err != nil {
+		s.logger.Error("failed to get unmatched deposits", "error", err)
+		http.Error(w, "Failed to get unmatched deposits", http.StatusInternalServerError)
+		return
+	}
+
+	totalCount, err := GetTotalUnmatchedDeposits(r.Context(), s.db)
+	if err != nil {
+		s.logger.Error("failed to get total unmatched count", "error", err)
+		http.Error(w, "Failed to get total unmatched count", http.StatusInternalServerError)
+		return
+	}
+
+	totalPages := int(math.Ceil(float64(totalCount) / float64(ItemsPerPage)))
+
+	component := UnmatchedDepositsList(deposits, page, totalPages)
+	err = component.Render(r.Context(), w)
+	if err != nil {
+		s.logger.Error("failed to render unmatched deposits list", "error", err)
+		http.Error(w, "Failed to render unmatched deposits list", http.StatusInternalServerError)
 		return
 	}
 }
