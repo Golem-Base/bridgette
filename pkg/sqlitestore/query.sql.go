@@ -426,6 +426,20 @@ func (q *Queries) UpdateBlockPointer(ctx context.Context, arg UpdateBlockPointer
 	return err
 }
 
+const updateBlockPointerIfNull = `-- name: UpdateBlockPointerIfNull :exec
+UPDATE BLOCK_POINTERS SET block_number = ? WHERE name = ? AND block_number IS NULL
+`
+
+type UpdateBlockPointerIfNullParams struct {
+	BlockNumber *int64
+	Name        string
+}
+
+func (q *Queries) UpdateBlockPointerIfNull(ctx context.Context, arg UpdateBlockPointerIfNullParams) error {
+	_, err := q.exec(ctx, q.updateBlockPointerIfNullStmt, updateBlockPointerIfNull, arg.BlockNumber, arg.Name)
+	return err
+}
+
 const updateL1DepositWithMatch = `-- name: UpdateL1DepositWithMatch :exec
 UPDATE l1_standard_bridge_eth_deposit_initiated
 SET 

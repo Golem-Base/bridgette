@@ -341,6 +341,17 @@ func main() {
 						return fmt.Errorf("failed to update block pointer: %w", err)
 					}
 
+					// Update the last processed block pointer if it's NULL
+					toBlockNumber := int64(toBlock)
+					err = txStore.UpdateBlockPointerIfNull(egCtx, sqlitestore.UpdateBlockPointerIfNullParams{
+						BlockNumber: &toBlockNumber,
+						Name:        L1_ETH_DEPOSIT_INITIATED_LAST_BLOCK,
+					})
+					if err != nil {
+						tx.Rollback()
+						return fmt.Errorf("failed to update last block pointer: %w", err)
+					}
+
 					// Commit the transaction
 					err = tx.Commit()
 					if err != nil {
@@ -507,6 +518,17 @@ func main() {
 					if err != nil {
 						tx.Rollback()
 						return fmt.Errorf("failed to update block pointer: %w", err)
+					}
+
+					// Update the last processed block pointer if it's NULL
+					toBlockNumber := int64(toBlock)
+					err = txStore.UpdateBlockPointerIfNull(egCtx, sqlitestore.UpdateBlockPointerIfNullParams{
+						BlockNumber: &toBlockNumber,
+						Name:        L2_ETH_DEPOSIT_FINALIZED_LAST_BLOCK,
+					})
+					if err != nil {
+						tx.Rollback()
+						return fmt.Errorf("failed to update last block pointer: %w", err)
 					}
 
 					// Commit the transaction

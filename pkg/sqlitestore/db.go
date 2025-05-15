@@ -60,6 +60,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateBlockPointerStmt, err = db.PrepareContext(ctx, updateBlockPointer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateBlockPointer: %w", err)
 	}
+	if q.updateBlockPointerIfNullStmt, err = db.PrepareContext(ctx, updateBlockPointerIfNull); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateBlockPointerIfNull: %w", err)
+	}
 	if q.updateL1DepositWithMatchStmt, err = db.PrepareContext(ctx, updateL1DepositWithMatch); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateL1DepositWithMatch: %w", err)
 	}
@@ -131,6 +134,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateBlockPointerStmt: %w", cerr)
 		}
 	}
+	if q.updateBlockPointerIfNullStmt != nil {
+		if cerr := q.updateBlockPointerIfNullStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateBlockPointerIfNullStmt: %w", cerr)
+		}
+	}
 	if q.updateL1DepositWithMatchStmt != nil {
 		if cerr := q.updateL1DepositWithMatchStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateL1DepositWithMatchStmt: %w", cerr)
@@ -192,6 +200,7 @@ type Queries struct {
 	insertL1StandardBridgeETHDepositInitiatedStmt *sql.Stmt
 	insertL2StandardBridgeDepositFinalizedStmt    *sql.Stmt
 	updateBlockPointerStmt                        *sql.Stmt
+	updateBlockPointerIfNullStmt                  *sql.Stmt
 	updateL1DepositWithMatchStmt                  *sql.Stmt
 	updateL2DepositWithMatchStmt                  *sql.Stmt
 }
@@ -212,6 +221,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		insertL1StandardBridgeETHDepositInitiatedStmt: q.insertL1StandardBridgeETHDepositInitiatedStmt,
 		insertL2StandardBridgeDepositFinalizedStmt:    q.insertL2StandardBridgeDepositFinalizedStmt,
 		updateBlockPointerStmt:                        q.updateBlockPointerStmt,
+		updateBlockPointerIfNullStmt:                  q.updateBlockPointerIfNullStmt,
 		updateL1DepositWithMatchStmt:                  q.updateL1DepositWithMatchStmt,
 		updateL2DepositWithMatchStmt:                  q.updateL2DepositWithMatchStmt,
 	}
