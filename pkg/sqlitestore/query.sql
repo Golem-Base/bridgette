@@ -143,3 +143,23 @@ FROM
 WHERE 
     matched_l2_standard_bridge_deposit_finalized_id IS NULL;
 
+-- name: GetLatestL1Block :one
+SELECT 
+    block_number,
+    block_timestamp
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+ORDER BY 
+    block_number DESC
+LIMIT 1;
+
+-- name: GetLatestL2Block :one
+SELECT 
+    block_number,
+    block_timestamp
+FROM 
+    l2_standard_bridge_deposit_finalized
+ORDER BY 
+    block_number DESC
+LIMIT 1;
+

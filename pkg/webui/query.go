@@ -96,6 +96,35 @@ func GetBridgeStats(ctx context.Context, db *sql.DB) (map[string]interface{}, er
 		return nil, err
 	}
 
+	// Get latest L1 block info
+	latestL1Block, err := queries.GetLatestL1Block(ctx)
+	if err != nil {
+		// Handle case when no L1 blocks exist yet
+		if err == sql.ErrNoRows {
+			latestL1Block.BlockNumber = 0
+			latestL1Block.BlockTimestamp = 0
+		} else {
+			return nil, err
+		}
+	}
+
+	// Get latest L2 block info
+	latestL2Block, err := queries.GetLatestL2Block(ctx)
+	if err != nil {
+		// Handle case when no L2 blocks exist yet
+		if err == sql.ErrNoRows {
+			latestL2Block.BlockNumber = 0
+			latestL2Block.BlockTimestamp = 0
+		} else {
+			return nil, err
+		}
+	}
+
+	// Calculate time since last block
+	currentTime := time.Now().Unix()
+	l1TimeSince := float64(currentTime - latestL1Block.BlockTimestamp)
+	l2TimeSince := float64(currentTime - latestL2Block.BlockTimestamp)
+
 	// Handle nullable fields
 	var avgTimeDiff, minTimeDiff, maxTimeDiff, totalBridgedEth float64
 
@@ -134,6 +163,10 @@ func GetBridgeStats(ctx context.Context, db *sql.DB) (map[string]interface{}, er
 		"max_time_diff":     maxTimeDiff,
 		"total_bridged_eth": totalBridgedEth,
 		"pending_deposits":  int(pendingDeposits),
+		"latest_l1_block":   int(latestL1Block.BlockNumber),
+		"latest_l2_block":   int(latestL2Block.BlockNumber),
+		"l1_time_since":     l1TimeSince,
+		"l2_time_since":     l2TimeSince,
 	}
 
 	return result, nil

@@ -37,6 +37,7 @@ func (s *Server) Start(ctx context.Context) error {
 	// Register handlers
 	mux.HandleFunc("GET /", s.handleIndex)
 	mux.HandleFunc("GET /deposits", s.handleDeposits)
+	mux.HandleFunc("GET /dashboard", s.handleDashboard)
 
 	server := &http.Server{
 		Addr:    s.addr,
@@ -111,6 +112,24 @@ func (s *Server) handleDeposits(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.logger.Error("failed to render deposits list", "error", err)
 		http.Error(w, "Failed to render deposits list", http.StatusInternalServerError)
+		return
+	}
+}
+
+// handleDashboard handles the dashboard content updates for auto-refresh
+func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
+	stats, err := GetBridgeStats(r.Context(), s.db)
+	if err != nil {
+		s.logger.Error("failed to get bridge stats", "error", err)
+		http.Error(w, "Failed to get bridge stats", http.StatusInternalServerError)
+		return
+	}
+
+	// Only render the dashboard content component, not the full layout
+	err = DashboardContent(stats).Render(r.Context(), w)
+	if err != nil {
+		s.logger.Error("failed to render dashboard content", "error", err)
+		http.Error(w, "Failed to render dashboard content", http.StatusInternalServerError)
 		return
 	}
 }

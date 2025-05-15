@@ -152,6 +152,52 @@ func (q *Queries) GetBridgeStats(ctx context.Context) (GetBridgeStatsRow, error)
 	return i, err
 }
 
+const getLatestL1Block = `-- name: GetLatestL1Block :one
+SELECT 
+    block_number,
+    block_timestamp
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+ORDER BY 
+    block_number DESC
+LIMIT 1
+`
+
+type GetLatestL1BlockRow struct {
+	BlockNumber    int64
+	BlockTimestamp int64
+}
+
+func (q *Queries) GetLatestL1Block(ctx context.Context) (GetLatestL1BlockRow, error) {
+	row := q.queryRow(ctx, q.getLatestL1BlockStmt, getLatestL1Block)
+	var i GetLatestL1BlockRow
+	err := row.Scan(&i.BlockNumber, &i.BlockTimestamp)
+	return i, err
+}
+
+const getLatestL2Block = `-- name: GetLatestL2Block :one
+SELECT 
+    block_number,
+    block_timestamp
+FROM 
+    l2_standard_bridge_deposit_finalized
+ORDER BY 
+    block_number DESC
+LIMIT 1
+`
+
+type GetLatestL2BlockRow struct {
+	BlockNumber    int64
+	BlockTimestamp int64
+}
+
+func (q *Queries) GetLatestL2Block(ctx context.Context) (GetLatestL2BlockRow, error) {
+	row := q.queryRow(ctx, q.getLatestL2BlockStmt, getLatestL2Block)
+	var i GetLatestL2BlockRow
+	err := row.Scan(&i.BlockNumber, &i.BlockTimestamp)
+	return i, err
+}
+
 const getMatchedDeposits = `-- name: GetMatchedDeposits :many
 
 SELECT 

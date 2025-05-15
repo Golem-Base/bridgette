@@ -36,6 +36,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getBridgeStatsStmt, err = db.PrepareContext(ctx, getBridgeStats); err != nil {
 		return nil, fmt.Errorf("error preparing query GetBridgeStats: %w", err)
 	}
+	if q.getLatestL1BlockStmt, err = db.PrepareContext(ctx, getLatestL1Block); err != nil {
+		return nil, fmt.Errorf("error preparing query GetLatestL1Block: %w", err)
+	}
+	if q.getLatestL2BlockStmt, err = db.PrepareContext(ctx, getLatestL2Block); err != nil {
+		return nil, fmt.Errorf("error preparing query GetLatestL2Block: %w", err)
+	}
 	if q.getMatchedDepositsStmt, err = db.PrepareContext(ctx, getMatchedDeposits); err != nil {
 		return nil, fmt.Errorf("error preparing query GetMatchedDeposits: %w", err)
 	}
@@ -83,6 +89,16 @@ func (q *Queries) Close() error {
 	if q.getBridgeStatsStmt != nil {
 		if cerr := q.getBridgeStatsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getBridgeStatsStmt: %w", cerr)
+		}
+	}
+	if q.getLatestL1BlockStmt != nil {
+		if cerr := q.getLatestL1BlockStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getLatestL1BlockStmt: %w", cerr)
+		}
+	}
+	if q.getLatestL2BlockStmt != nil {
+		if cerr := q.getLatestL2BlockStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getLatestL2BlockStmt: %w", cerr)
 		}
 	}
 	if q.getMatchedDepositsStmt != nil {
@@ -168,6 +184,8 @@ type Queries struct {
 	findMatchingL2DepositsStmt                    *sql.Stmt
 	getBlockPointerStmt                           *sql.Stmt
 	getBridgeStatsStmt                            *sql.Stmt
+	getLatestL1BlockStmt                          *sql.Stmt
+	getLatestL2BlockStmt                          *sql.Stmt
 	getMatchedDepositsStmt                        *sql.Stmt
 	getPendingDepositsStmt                        *sql.Stmt
 	getTotalMatchedDepositsStmt                   *sql.Stmt
@@ -186,6 +204,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		findMatchingL2DepositsStmt:  q.findMatchingL2DepositsStmt,
 		getBlockPointerStmt:         q.getBlockPointerStmt,
 		getBridgeStatsStmt:          q.getBridgeStatsStmt,
+		getLatestL1BlockStmt:        q.getLatestL1BlockStmt,
+		getLatestL2BlockStmt:        q.getLatestL2BlockStmt,
 		getMatchedDepositsStmt:      q.getMatchedDepositsStmt,
 		getPendingDepositsStmt:      q.getPendingDepositsStmt,
 		getTotalMatchedDepositsStmt: q.getTotalMatchedDepositsStmt,

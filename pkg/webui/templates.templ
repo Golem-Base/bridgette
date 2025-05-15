@@ -3,8 +3,6 @@ package webui
 import (
 	"fmt"
 	"time"
-	
-	"github.com/a-h/templ"
 )
 
 templ Layout(title string) {
@@ -15,6 +13,8 @@ templ Layout(title string) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title } - Golem Bridge Monitor</title>
 			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<script src="https://unpkg.com/morphdom@2.6.1/dist/morphdom-umd.js"></script>
+			<script src="https://unpkg.com/htmx.org/dist/ext/morphdom-swap.js"></script>
 			<script src="https://cdn.tailwindcss.com"></script>
 			<style>
 				:root {
@@ -71,7 +71,7 @@ templ Layout(title string) {
 				}
 			</style>
 		</head>
-		<body>
+		<body hx-ext="morphdom-swap">
 			<header class="golem-header py-4">
 				<div class="container mx-auto px-4">
 					<div class="flex items-center justify-between">
@@ -95,50 +95,87 @@ templ Layout(title string) {
 	</html>
 }
 
+// DashboardContent contains only the content that should be refreshed
+templ DashboardContent(stats map[string]interface{}) {
+	<div id="dashboard-content" hx-get="/dashboard" hx-trigger="every 2s" hx-swap="morphdom" hx-target="#dashboard-metrics">
+		<div id="dashboard-metrics">
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+				<div class="golem-card">
+					<h3 class="text-lg font-semibold mb-2">Total Matched Deposits</h3>
+					<p class="text-3xl font-bold">{ fmt.Sprintf("%d", stats["total_matched"].(int)) }</p>
+				</div>
+				<div class="golem-card">
+					<h3 class="text-lg font-semibold mb-2">Average Confirmation Time</h3>
+					<p class="text-3xl font-bold">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</p>
+				</div>
+				<div class="golem-card">
+					<h3 class="text-lg font-semibold mb-2">Total Bridged ETH</h3>
+					<p class="text-3xl font-bold">{ fmt.Sprintf("%.4f ETH", stats["total_bridged_eth"].(float64)) }</p>
+				</div>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+				<div class="golem-card">
+					<h2 class="text-xl font-bold mb-4">Latest L1 Block</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<h4 class="text-sm font-medium text-gray-500">Block Number</h4>
+							<p class="text-lg font-semibold">{ fmt.Sprintf("%d", stats["latest_l1_block"].(int)) }</p>
+						</div>
+						<div>
+							<h4 class="text-sm font-medium text-gray-500">Time Since</h4>
+							<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["l1_time_since"].(float64)) }</p>
+						</div>
+					</div>
+				</div>
+				<div class="golem-card">
+					<h2 class="text-xl font-bold mb-4">Latest L2 Block</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<h4 class="text-sm font-medium text-gray-500">Block Number</h4>
+							<p class="text-lg font-semibold">{ fmt.Sprintf("%d", stats["latest_l2_block"].(int)) }</p>
+						</div>
+						<div>
+							<h4 class="text-sm font-medium text-gray-500">Time Since</h4>
+							<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["l2_time_since"].(float64)) }</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="golem-card mb-8">
+				<h2 class="text-xl font-bold mb-4">Bridge Performance</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div>
+						<h4 class="text-sm font-medium text-gray-500">Minimum Time</h4>
+						<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["min_time_diff"].(float64)) }</p>
+					</div>
+					<div>
+						<h4 class="text-sm font-medium text-gray-500">Average Time</h4>
+						<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</p>
+					</div>
+					<div>
+						<h4 class="text-sm font-medium text-gray-500">Maximum Time</h4>
+						<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["max_time_diff"].(float64)) }</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="golem-card">
+		<div class="mb-6">
+			<h2 class="text-xl font-bold">Deposit Timeline</h2>
+		</div>
+		<div id="deposits-wrapper">
+			<div id="deposits-container" hx-get="/deposits" hx-trigger="load delay:200ms" hx-swap="innerHTML"></div>
+		</div>
+	</div>
+}
+
 templ Dashboard(stats map[string]interface{}) {
 	@Layout("Dashboard") {
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-			<div class="golem-card">
-				<h3 class="text-lg font-semibold mb-2">Total Matched Deposits</h3>
-				<p class="text-3xl font-bold">{ fmt.Sprintf("%d", stats["total_matched"].(int)) }</p>
-			</div>
-			<div class="golem-card">
-				<h3 class="text-lg font-semibold mb-2">Average Confirmation Time</h3>
-				<p class="text-3xl font-bold">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</p>
-			</div>
-			<div class="golem-card">
-				<h3 class="text-lg font-semibold mb-2">Total Bridged ETH</h3>
-				<p class="text-3xl font-bold">{ fmt.Sprintf("%.4f ETH", stats["total_bridged_eth"].(float64)) }</p>
-			</div>
-		</div>
-
-		<div class="golem-card mb-8">
-			<h2 class="text-xl font-bold mb-4">Bridge Performance</h2>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-				<div>
-					<h4 class="text-sm font-medium text-gray-500">Minimum Time</h4>
-					<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["min_time_diff"].(float64)) }</p>
-				</div>
-				<div>
-					<h4 class="text-sm font-medium text-gray-500">Average Time</h4>
-					<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</p>
-				</div>
-				<div>
-					<h4 class="text-sm font-medium text-gray-500">Maximum Time</h4>
-					<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["max_time_diff"].(float64)) }</p>
-				</div>
-			</div>
-		</div>
-
-		<div class="golem-card">
-			<div class="flex justify-between items-center mb-6">
-				<h2 class="text-xl font-bold">Deposit Timeline</h2>
-				<button class="golem-button" hx-get="/deposits" hx-target="#deposits-container" hx-swap="innerHTML">
-					Refresh
-				</button>
-			</div>
-			<div id="deposits-container" hx-get="/deposits" hx-trigger="load" hx-swap="innerHTML"></div>
-		</div>
+		@DashboardContent(stats)
 	}
 }
 
@@ -164,7 +201,7 @@ templ DepositsList(deposits []DepositPair, page, totalPages int) {
 						class="golem-button" 
 						hx-get={ fmt.Sprintf("/deposits?page=%d", page-1) } 
 						hx-target="#deposits-container" 
-						hx-swap="innerHTML"
+						hx-swap="morphdom"
 					>
 						Previous
 					</button>
@@ -174,7 +211,7 @@ templ DepositsList(deposits []DepositPair, page, totalPages int) {
 						class="golem-button" 
 						hx-get={ fmt.Sprintf("/deposits?page=%d", page+1) } 
 						hx-target="#deposits-container" 
-						hx-swap="innerHTML"
+						hx-swap="morphdom"
 					>
 						Next
 					</button>
