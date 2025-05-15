@@ -61,14 +61,16 @@ func main() {
 	log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	cfg := struct {
-		l1ExecutionURL  string
-		l2ExecutionURL  string
-		dbURL           string
-		addr            string
-		l1BridgeAddress string
-		webUIAddr       string
-		l1BlockInterval time.Duration
-		l2BlockInterval time.Duration
+		l1ExecutionURL       string
+		l2ExecutionURL       string
+		dbURL                string
+		addr                 string
+		l1BridgeAddress      string
+		webUIAddr            string
+		l1BlockInterval      time.Duration
+		l2BlockInterval      time.Duration
+		backfillingBatchSize uint64
+		forwardingBatchSize  uint64
 	}{}
 
 	app := &cli.App{
@@ -131,6 +133,18 @@ func main() {
 				EnvVars:     []string{"L2_BLOCK_INTERVAL"},
 				Destination: &cfg.l2BlockInterval,
 			},
+			&cli.Uint64Flag{
+				Name:        "backfilling-batch-size",
+				Usage:       "The batch size for the backfilling",
+				Value:       10000,
+				Destination: &cfg.backfillingBatchSize,
+			},
+			&cli.Uint64Flag{
+				Name:        "forwarding-batch-size",
+				Usage:       "The batch size for the forwarding",
+				Value:       100,
+				Destination: &cfg.forwardingBatchSize,
+			},
 		},
 		Action: func(c *cli.Context) error {
 
@@ -166,30 +180,6 @@ func main() {
 
 			log := log.With("l1_bridge_address", bridgeAddress)
 
-			// fromBlock := uint64(8311163 - 200)
-
-			// logsChan := make(chan types.Log, 200)
-			// sub, err := l1Client.SubscribeFilterLogs(
-			// 	ctx,
-			// 	ethereum.FilterQuery{
-			// 		Addresses: []common.Address{bridgeAddress},
-			// 		Topics:    [][]common.Hash{{ethBridgeInitiatedEvent}},
-			// 		FromBlock: big.NewInt(int64(fromBlock)),
-			// 	},
-			// 	logsChan,
-			// )
-
-			// go func() {
-			// 	select {
-			// 	case err := <-sub.Err():
-			// 		log.Error("subscription error", "error", err)
-			// 		stop()
-			// 	case <-ctx.Done():
-			// 		log.Info("context done")
-			// 		return
-			// 	}
-			// }()
-
 			autocommitStore := sqlitestore.New(db)
 
 			eg, egCtx := errgroup.WithContext(ctx)
@@ -216,8 +206,8 @@ func main() {
 
 					toBlock := fromBlock - 1
 
-					if fromBlock > 10_000 {
-						fromBlock -= 10_000
+					if fromBlock > cfg.backfillingBatchSize {
+						fromBlock -= cfg.backfillingBatchSize
 					} else {
 						fromBlock = 0
 					}
@@ -411,8 +401,8 @@ func main() {
 				for fromBlock > 0 {
 					toBlock := fromBlock - 1
 
-					if fromBlock > 10_000 {
-						fromBlock -= 10_000
+					if fromBlock > cfg.backfillingBatchSize {
+						fromBlock -= cfg.backfillingBatchSize
 					} else {
 						fromBlock = 0
 					}
@@ -621,12 +611,7 @@ func main() {
 						if lastProcessedBlock.BlockNumber != nil {
 							fromBlock = uint64(*lastProcessedBlock.BlockNumber) + 1
 						} else {
-							// If last processed block is nil, get the current block and start from there
-							currentBlock, err := l1Client.BlockNumber(egCtx)
-							if err != nil {
-								return fmt.Errorf("failed to get current block number: %w", err)
-							}
-							fromBlock = currentBlock
+							return fmt.Errorf("last processed block is nil")
 						}
 
 						// Get the current head block
@@ -642,7 +627,7 @@ func main() {
 						}
 
 						// Process blocks in chunks of max 100
-						toBlock := fromBlock + 99
+						toBlock := fromBlock + (cfg.forwardingBatchSize - 1)
 						if toBlock > headBlock {
 							toBlock = headBlock
 						}
@@ -816,12 +801,7 @@ func main() {
 						if lastProcessedBlock.BlockNumber != nil {
 							fromBlock = uint64(*lastProcessedBlock.BlockNumber) + 1
 						} else {
-							// If last processed block is nil, get the current block and start from there
-							currentBlock, err := l2Client.BlockNumber(egCtx)
-							if err != nil {
-								return fmt.Errorf("failed to get current block number: %w", err)
-							}
-							fromBlock = currentBlock
+							return fmt.Errorf("last processed block is nil")
 						}
 
 						// Get the current head block
@@ -837,7 +817,7 @@ func main() {
 						}
 
 						// Process blocks in chunks of max 100
-						toBlock := fromBlock + 99
+						toBlock := fromBlock + cfg.forwardingBatchSize - 1
 						if toBlock > headBlock {
 							toBlock = headBlock
 						}
