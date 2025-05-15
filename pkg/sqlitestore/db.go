@@ -33,6 +33,18 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getBlockPointerStmt, err = db.PrepareContext(ctx, getBlockPointer); err != nil {
 		return nil, fmt.Errorf("error preparing query GetBlockPointer: %w", err)
 	}
+	if q.getBridgeStatsStmt, err = db.PrepareContext(ctx, getBridgeStats); err != nil {
+		return nil, fmt.Errorf("error preparing query GetBridgeStats: %w", err)
+	}
+	if q.getMatchedDepositsStmt, err = db.PrepareContext(ctx, getMatchedDeposits); err != nil {
+		return nil, fmt.Errorf("error preparing query GetMatchedDeposits: %w", err)
+	}
+	if q.getPendingDepositsStmt, err = db.PrepareContext(ctx, getPendingDeposits); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPendingDeposits: %w", err)
+	}
+	if q.getTotalMatchedDepositsStmt, err = db.PrepareContext(ctx, getTotalMatchedDeposits); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTotalMatchedDeposits: %w", err)
+	}
 	if q.insertL1StandardBridgeETHDepositInitiatedStmt, err = db.PrepareContext(ctx, insertL1StandardBridgeETHDepositInitiated); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertL1StandardBridgeETHDepositInitiated: %w", err)
 	}
@@ -66,6 +78,26 @@ func (q *Queries) Close() error {
 	if q.getBlockPointerStmt != nil {
 		if cerr := q.getBlockPointerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getBlockPointerStmt: %w", cerr)
+		}
+	}
+	if q.getBridgeStatsStmt != nil {
+		if cerr := q.getBridgeStatsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getBridgeStatsStmt: %w", cerr)
+		}
+	}
+	if q.getMatchedDepositsStmt != nil {
+		if cerr := q.getMatchedDepositsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getMatchedDepositsStmt: %w", cerr)
+		}
+	}
+	if q.getPendingDepositsStmt != nil {
+		if cerr := q.getPendingDepositsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPendingDepositsStmt: %w", cerr)
+		}
+	}
+	if q.getTotalMatchedDepositsStmt != nil {
+		if cerr := q.getTotalMatchedDepositsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTotalMatchedDepositsStmt: %w", cerr)
 		}
 	}
 	if q.insertL1StandardBridgeETHDepositInitiatedStmt != nil {
@@ -135,6 +167,10 @@ type Queries struct {
 	findMatchingL1DepositsStmt                    *sql.Stmt
 	findMatchingL2DepositsStmt                    *sql.Stmt
 	getBlockPointerStmt                           *sql.Stmt
+	getBridgeStatsStmt                            *sql.Stmt
+	getMatchedDepositsStmt                        *sql.Stmt
+	getPendingDepositsStmt                        *sql.Stmt
+	getTotalMatchedDepositsStmt                   *sql.Stmt
 	insertL1StandardBridgeETHDepositInitiatedStmt *sql.Stmt
 	insertL2StandardBridgeDepositFinalizedStmt    *sql.Stmt
 	updateBlockPointerStmt                        *sql.Stmt
@@ -144,11 +180,15 @@ type Queries struct {
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                         tx,
-		tx:                         tx,
-		findMatchingL1DepositsStmt: q.findMatchingL1DepositsStmt,
-		findMatchingL2DepositsStmt: q.findMatchingL2DepositsStmt,
-		getBlockPointerStmt:        q.getBlockPointerStmt,
+		db:                          tx,
+		tx:                          tx,
+		findMatchingL1DepositsStmt:  q.findMatchingL1DepositsStmt,
+		findMatchingL2DepositsStmt:  q.findMatchingL2DepositsStmt,
+		getBlockPointerStmt:         q.getBlockPointerStmt,
+		getBridgeStatsStmt:          q.getBridgeStatsStmt,
+		getMatchedDepositsStmt:      q.getMatchedDepositsStmt,
+		getPendingDepositsStmt:      q.getPendingDepositsStmt,
+		getTotalMatchedDepositsStmt: q.getTotalMatchedDepositsStmt,
 		insertL1StandardBridgeETHDepositInitiatedStmt: q.insertL1StandardBridgeETHDepositInitiatedStmt,
 		insertL2StandardBridgeDepositFinalizedStmt:    q.insertL2StandardBridgeDepositFinalizedStmt,
 		updateBlockPointerStmt:                        q.updateBlockPointerStmt,

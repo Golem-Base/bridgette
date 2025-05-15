@@ -116,6 +116,154 @@ func (q *Queries) GetBlockPointer(ctx context.Context, name string) (*int64, err
 	return block_number, err
 }
 
+const getBridgeStats = `-- name: GetBridgeStats :one
+SELECT 
+    COUNT(*) as total_matched,
+    AVG(l2.block_timestamp - l1.block_timestamp) as avg_time_diff,
+    MIN(l2.block_timestamp - l1.block_timestamp) as min_time_diff,
+    MAX(l2.block_timestamp - l1.block_timestamp) as max_time_diff,
+    SUM(l1.amount) as total_bridged_eth
+FROM 
+    l1_standard_bridge_eth_deposit_initiated l1
+JOIN 
+    l2_standard_bridge_deposit_finalized l2 
+ON 
+    l1.matched_l2_standard_bridge_deposit_finalized_id = l2.id
+`
+
+type GetBridgeStatsRow struct {
+	TotalMatched    int64
+	AvgTimeDiff     *float64
+	MinTimeDiff     interface{}
+	MaxTimeDiff     interface{}
+	TotalBridgedEth *float64
+}
+
+func (q *Queries) GetBridgeStats(ctx context.Context) (GetBridgeStatsRow, error) {
+	row := q.queryRow(ctx, q.getBridgeStatsStmt, getBridgeStats)
+	var i GetBridgeStatsRow
+	err := row.Scan(
+		&i.TotalMatched,
+		&i.AvgTimeDiff,
+		&i.MinTimeDiff,
+		&i.MaxTimeDiff,
+		&i.TotalBridgedEth,
+	)
+	return i, err
+}
+
+const getMatchedDeposits = `-- name: GetMatchedDeposits :many
+
+SELECT 
+    l1.id,
+    l1.from_address,
+    l1.to_address,
+    l1.amount,
+    l1.block_number as l1_block_number,
+    l2.block_number as l2_block_number,
+    l1.block_timestamp as l1_timestamp,
+    l2.block_timestamp as l2_timestamp,
+    (l2.block_timestamp - l1.block_timestamp) as time_diff_seconds,
+    l1.tx_hash as tx_hash_l1,
+    l2.tx_hash as tx_hash_l2
+FROM 
+    l1_standard_bridge_eth_deposit_initiated l1
+JOIN 
+    l2_standard_bridge_deposit_finalized l2 
+ON 
+    l1.matched_l2_standard_bridge_deposit_finalized_id = l2.id
+ORDER BY 
+    l1.block_timestamp DESC
+LIMIT ? OFFSET ?
+`
+
+type GetMatchedDepositsParams struct {
+	Limit  int64
+	Offset int64
+}
+
+type GetMatchedDepositsRow struct {
+	ID              int64
+	FromAddress     []byte
+	ToAddress       []byte
+	Amount          float64
+	L1BlockNumber   int64
+	L2BlockNumber   int64
+	L1Timestamp     int64
+	L2Timestamp     int64
+	TimeDiffSeconds interface{}
+	TxHashL1        []byte
+	TxHashL2        []byte
+}
+
+// Web UI Queries
+func (q *Queries) GetMatchedDeposits(ctx context.Context, arg GetMatchedDepositsParams) ([]GetMatchedDepositsRow, error) {
+	rows, err := q.query(ctx, q.getMatchedDepositsStmt, getMatchedDeposits, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMatchedDepositsRow
+	for rows.Next() {
+		var i GetMatchedDepositsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FromAddress,
+			&i.ToAddress,
+			&i.Amount,
+			&i.L1BlockNumber,
+			&i.L2BlockNumber,
+			&i.L1Timestamp,
+			&i.L2Timestamp,
+			&i.TimeDiffSeconds,
+			&i.TxHashL1,
+			&i.TxHashL2,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPendingDeposits = `-- name: GetPendingDeposits :one
+SELECT 
+    COUNT(*) 
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+WHERE 
+    matched_l2_standard_bridge_deposit_finalized_id IS NULL
+`
+
+func (q *Queries) GetPendingDeposits(ctx context.Context) (int64, error) {
+	row := q.queryRow(ctx, q.getPendingDepositsStmt, getPendingDeposits)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getTotalMatchedDeposits = `-- name: GetTotalMatchedDeposits :one
+SELECT 
+    COUNT(*)
+FROM 
+    l1_standard_bridge_eth_deposit_initiated
+WHERE 
+    matched_l2_standard_bridge_deposit_finalized_id IS NOT NULL
+`
+
+func (q *Queries) GetTotalMatchedDeposits(ctx context.Context) (int64, error) {
+	row := q.queryRow(ctx, q.getTotalMatchedDepositsStmt, getTotalMatchedDeposits)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const insertL1StandardBridgeETHDepositInitiated = `-- name: InsertL1StandardBridgeETHDepositInitiated :one
 INSERT INTO l1_standard_bridge_eth_deposit_initiated (
     block_number,
