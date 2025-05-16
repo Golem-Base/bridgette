@@ -54,6 +54,9 @@ func (s *Server) Start(ctx context.Context) error {
 	// API endpoints
 	mux.HandleFunc("GET /api/chart-data", s.handleTimeSeriesData)
 
+	// Static files
+	mux.Handle("GET /static/", http.StripPrefix("/static/", createStaticHandler()))
+
 	server := &http.Server{
 		Addr:    s.addr,
 		Handler: mux,

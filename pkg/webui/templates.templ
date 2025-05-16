@@ -12,10 +12,10 @@ templ Layout(title string) {
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title } - Golem Bridge Monitor</title>
-			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
-			<script src="https://unpkg.com/morphdom@2.6.1/dist/morphdom-umd.js"></script>
-			<script src="https://unpkg.com/htmx.org/dist/ext/morphdom-swap.js"></script>
-			<script src="https://cdn.tailwindcss.com"></script>
+			<script src="/static/js/htmx.min.js"></script>
+			<script src="/static/js/morphdom.min.js"></script>
+			<script src="/static/js/morphdom-swap.js"></script>
+			<script src="/static/js/tailwind.min.js"></script>
 			<style>
 				:root {
 					--golem-primary: #1a3ad3;
@@ -345,8 +345,8 @@ templ TimeSeriesChart() {
 		<div class="relative h-96">
 			<canvas id="timeSeriesChart"></canvas>
 		</div>
-		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+		<script src="/static/js/chart.min.js"></script>
+		<script src="/static/js/chartjs-adapter-date-fns.min.js"></script>
 		<script>
 			// Chart instance to enable updates
 			let timeSeriesChart;
