@@ -124,6 +124,20 @@ FROM
 WHERE 
     matched_l2_standard_bridge_deposit_finalized_id IS NOT NULL;
 
+-- name: GetTimeSeriesChartData :many
+SELECT 
+    l1.block_timestamp as timestamp,
+    (l2.block_timestamp - l1.block_timestamp) as time_diff_seconds
+FROM 
+    l1_standard_bridge_eth_deposit_initiated l1
+JOIN 
+    l2_standard_bridge_deposit_finalized l2 
+ON 
+    l1.matched_l2_standard_bridge_deposit_finalized_id = l2.id
+ORDER BY 
+    l1.block_timestamp DESC
+LIMIT ?;
+
 -- name: GetBridgeStats :one
 SELECT 
     COUNT(*) as total_matched,
