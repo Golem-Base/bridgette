@@ -291,9 +291,9 @@ templ UnmatchedDepositItem(deposit UnmatchedDeposit) {
 				<h4 class="text-xs font-medium text-gray-500 uppercase mb-1">L1 Deposit</h4>
 				<p class="text-sm">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
 				<p class="text-sm">Time: { formatTime(deposit.L1Timestamp) }</p>
-				<a href={ etherscanURL(deposit.TxHashL1) } target="_blank" class="text-sm text-blue-600 hover:underline">
+				<span class="text-sm text-blue-600">
 					Tx: { shortenAddress(deposit.TxHashL1) }
-				</a>
+				</span>
 			</div>
 		</div>
 	</div>
@@ -318,17 +318,17 @@ templ DepositItem(deposit DepositPair) {
 					<h4 class="text-xs font-medium text-gray-500 uppercase mb-1">L1 Deposit</h4>
 					<p class="text-sm">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
 					<p class="text-sm">Time: { formatTime(deposit.L1Timestamp) }</p>
-					<a href={ etherscanURL(deposit.TxHashL1) } target="_blank" class="text-sm text-blue-600 hover:underline">
+					<span class="text-sm text-blue-600">
 						Tx: { shortenAddress(deposit.TxHashL1) }
-					</a>
+					</span>
 				</div>
 				<div>
 					<h4 class="text-xs font-medium text-gray-500 uppercase mb-1">L2 Confirmation</h4>
 					<p class="text-sm">Block: { fmt.Sprintf("%d", deposit.L2BlockNumber) }</p>
 					<p class="text-sm">Time: { formatTime(deposit.L2Timestamp) }</p>
-					<a href={ explorerURL(deposit.TxHashL2) } target="_blank" class="text-sm text-blue-600 hover:underline">
+					<span class="text-sm text-blue-600">
 						Tx: { shortenAddress(deposit.TxHashL2) }
-					</a>
+					</span>
 				</div>
 			</div>
 		</div>
