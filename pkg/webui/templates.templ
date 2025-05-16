@@ -99,6 +99,9 @@ templ Dashboard() {
 		<div class="space-y-8">
 			<div id="dashboard-metrics" hx-get="/dashboard/metrics" hx-trigger="load"></div>
 			<div id="bridge-performance" hx-get="/dashboard/performance" hx-trigger="load"></div>
+			<div>
+				@TimeSeriesChart()
+			</div>
 			<div id="unmatched-deposits-section" hx-get="/dashboard/unmatched" hx-trigger="load"></div>
 			<div id="deposits-timeline-section" hx-get="/dashboard/timeline" hx-trigger="load"></div>
 		</div>
@@ -332,5 +335,120 @@ templ DepositItem(deposit DepositPair) {
 				</div>
 			</div>
 		</div>
+	</div>
+}
+
+// TimeSeriesChart displays a chart of deposit time differences over time
+templ TimeSeriesChart() {
+	<div class="golem-card" hx-swap="morphdom">
+		<h2 class="text-xl font-bold mb-4">Deposit Confirmation Times</h2>
+		<div class="relative h-96">
+			<canvas id="timeSeriesChart"></canvas>
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+		<script>
+			// Chart instance to enable updates
+			let timeSeriesChart;
+
+			// Initialize the chart once
+			function initializeChart() {
+				const ctx = document.getElementById('timeSeriesChart');
+				timeSeriesChart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						datasets: [{
+							label: 'Confirmation Time (seconds)',
+							data: [],
+							backgroundColor: 'rgba(26, 58, 211, 0.1)',
+							borderColor: '#1a3ad3',
+							borderWidth: 1,
+							pointStyle: 'circle',
+							pointRadius: 2,									
+							tension: 0.05,
+							fill: true
+						}]
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							title: {
+								display: false
+							},
+							legend: {
+								display: false
+							},
+							tooltip: {
+								callbacks: {
+									title: function(context) {
+										// Simply format the x value directly
+										if (context[0].parsed.x) {
+											const date = new Date(context[0].parsed.x);
+											return date.toLocaleString();
+										}
+										return '';
+									}
+								}
+							}
+						},
+						scales: {
+							y: {
+								title: {
+									display: true,
+									text: 'Seconds'
+								},
+								beginAtZero: true
+							},
+							x: {
+								type: 'time',
+								time: {
+									unit: 'hour',
+									displayFormats: {
+										hour: 'MMM d, HH:mm'
+									},
+									tooltipFormat: 'MMM d, yyyy HH:mm'
+								},
+								title: {
+									display: true,
+									text: 'Date'
+								}
+							}
+						}
+					}
+				});
+			}
+
+			// Function to fetch data and update the chart
+			function updateChart() {
+				fetch('/api/chart-data')
+					.then(response => response.json())
+					.then(data => {
+						// Create dataset with proper timestamp objects
+						const dataset = data.map(point => {
+							return {
+								x: new Date(point.timestamp),
+								y: point.timeDiffSeconds
+							};
+						});
+
+						// Update chart data without destroying the chart
+						if (timeSeriesChart) {
+							timeSeriesChart.data.datasets[0].data = dataset;
+							timeSeriesChart.update();
+						}
+					})
+					.catch(error => console.error('Error fetching chart data:', error));
+			}
+
+			// Initialize chart once
+			initializeChart();
+			
+			// Initial data load
+			updateChart();
+
+			// Refresh data every 10 seconds
+			setInterval(updateChart, 10000);
+		</script>
 	</div>
 }

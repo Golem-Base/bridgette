@@ -6,10 +6,15 @@ package webui
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log/slog"
 	"math"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/Golem-Base/bridgette/pkg/sqlitestore"
 )
 
 const (
@@ -45,6 +50,9 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.HandleFunc("GET /dashboard/performance", s.handleBridgePerformance)
 	mux.HandleFunc("GET /dashboard/unmatched", s.handleUnmatchedDepositsSection)
 	mux.HandleFunc("GET /dashboard/timeline", s.handleDepositsTimelineSection)
+
+	// API endpoints
+	mux.HandleFunc("GET /api/chart-data", s.handleTimeSeriesData)
 
 	server := &http.Server{
 		Addr:    s.addr,
@@ -110,6 +118,72 @@ func (s *Server) handleBridgePerformance(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		s.logger.Error("failed to render bridge performance", "error", err)
 		http.Error(w, "Failed to render bridge performance", http.StatusInternalServerError)
+		return
+	}
+}
+
+// handleTimeSeriesData handles the API endpoint for chart data
+func (s *Server) handleTimeSeriesData(w http.ResponseWriter, r *http.Request) {
+	// Get the limit parameter (default to 20)
+	limitStr := r.URL.Query().Get("limit")
+	limit := 30
+	if limitStr != "" {
+		parsedLimit, err := strconv.Atoi(limitStr)
+		if err == nil && parsedLimit > 0 {
+			limit = parsedLimit
+		}
+	}
+
+	// Create a queries object using the sqlitestore package
+	queries := sqlitestore.New(s.db)
+
+	// Get the time series chart data
+	data, err := queries.GetTimeSeriesChartData(r.Context(), int64(limit))
+	if err != nil {
+		s.logger.Error("failed to query deposit time differences", "error", err)
+		http.Error(w, "Failed to query deposit time differences", http.StatusInternalServerError)
+		return
+	}
+
+	// Transform data for the chart
+	type chartDataPoint struct {
+		Timestamp       string  `json:"timestamp"`
+		TimeDiffSeconds float64 `json:"timeDiffSeconds"`
+	}
+
+	chartData := make([]chartDataPoint, 0, len(data))
+	for _, point := range data {
+		// Convert unix timestamp to a readable date/time
+		t := time.Unix(point.Timestamp, 0)
+
+		// Use seconds directly without converting to hours
+		var timeDiffSeconds float64
+		timeDiffSecs, ok := point.TimeDiffSeconds.(int64)
+		if !ok {
+			// Try as float64
+			if timeDiffSecsFloat, ok := point.TimeDiffSeconds.(float64); ok {
+				timeDiffSeconds = timeDiffSecsFloat
+			} else {
+				// Default to 0 if conversion fails
+				s.logger.Warn("unexpected type for time_diff_seconds", "type", fmt.Sprintf("%T", point.TimeDiffSeconds))
+				timeDiffSeconds = 0
+			}
+		} else {
+			timeDiffSeconds = float64(timeDiffSecs)
+		}
+
+		chartData = append(chartData, chartDataPoint{
+			Timestamp:       t.Format(time.RFC3339),
+			TimeDiffSeconds: timeDiffSeconds,
+		})
+	}
+
+	// Set content type and encode the response as JSON
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(chartData)
+	if err != nil {
+		s.logger.Error("failed to encode chart data as JSON", "error", err)
+		http.Error(w, "Failed to encode chart data", http.StatusInternalServerError)
 		return
 	}
 }

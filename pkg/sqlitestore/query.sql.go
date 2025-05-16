@@ -299,6 +299,49 @@ func (q *Queries) GetPendingDeposits(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const getTimeSeriesChartData = `-- name: GetTimeSeriesChartData :many
+SELECT 
+    l1.block_timestamp as timestamp,
+    (l2.block_timestamp - l1.block_timestamp) as time_diff_seconds
+FROM 
+    l1_standard_bridge_eth_deposit_initiated l1
+JOIN 
+    l2_standard_bridge_deposit_finalized l2 
+ON 
+    l1.matched_l2_standard_bridge_deposit_finalized_id = l2.id
+ORDER BY 
+    l1.block_timestamp DESC
+LIMIT ?
+`
+
+type GetTimeSeriesChartDataRow struct {
+	Timestamp       int64
+	TimeDiffSeconds interface{}
+}
+
+func (q *Queries) GetTimeSeriesChartData(ctx context.Context, limit int64) ([]GetTimeSeriesChartDataRow, error) {
+	rows, err := q.query(ctx, q.getTimeSeriesChartDataStmt, getTimeSeriesChartData, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTimeSeriesChartDataRow
+	for rows.Next() {
+		var i GetTimeSeriesChartDataRow
+		if err := rows.Scan(&i.Timestamp, &i.TimeDiffSeconds); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTotalMatchedDeposits = `-- name: GetTotalMatchedDeposits :one
 SELECT 
     COUNT(*)

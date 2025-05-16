@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getPendingDepositsStmt, err = db.PrepareContext(ctx, getPendingDeposits); err != nil {
 		return nil, fmt.Errorf("error preparing query GetPendingDeposits: %w", err)
 	}
+	if q.getTimeSeriesChartDataStmt, err = db.PrepareContext(ctx, getTimeSeriesChartData); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTimeSeriesChartData: %w", err)
+	}
 	if q.getTotalMatchedDepositsStmt, err = db.PrepareContext(ctx, getTotalMatchedDeposits); err != nil {
 		return nil, fmt.Errorf("error preparing query GetTotalMatchedDeposits: %w", err)
 	}
@@ -118,6 +121,11 @@ func (q *Queries) Close() error {
 	if q.getPendingDepositsStmt != nil {
 		if cerr := q.getPendingDepositsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getPendingDepositsStmt: %w", cerr)
+		}
+	}
+	if q.getTimeSeriesChartDataStmt != nil {
+		if cerr := q.getTimeSeriesChartDataStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTimeSeriesChartDataStmt: %w", cerr)
 		}
 	}
 	if q.getTotalMatchedDepositsStmt != nil {
@@ -212,6 +220,7 @@ type Queries struct {
 	getLatestL2BlockStmt                          *sql.Stmt
 	getMatchedDepositsStmt                        *sql.Stmt
 	getPendingDepositsStmt                        *sql.Stmt
+	getTimeSeriesChartDataStmt                    *sql.Stmt
 	getTotalMatchedDepositsStmt                   *sql.Stmt
 	getTotalUnmatchedDepositsStmt                 *sql.Stmt
 	getUnmatchedDepositsStmt                      *sql.Stmt
@@ -235,6 +244,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getLatestL2BlockStmt:          q.getLatestL2BlockStmt,
 		getMatchedDepositsStmt:        q.getMatchedDepositsStmt,
 		getPendingDepositsStmt:        q.getPendingDepositsStmt,
+		getTimeSeriesChartDataStmt:    q.getTimeSeriesChartDataStmt,
 		getTotalMatchedDepositsStmt:   q.getTotalMatchedDepositsStmt,
 		getTotalUnmatchedDepositsStmt: q.getTotalUnmatchedDepositsStmt,
 		getUnmatchedDepositsStmt:      q.getUnmatchedDepositsStmt,

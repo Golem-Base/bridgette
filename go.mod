@@ -3,6 +3,7 @@ module github.com/Golem-Base/bridgette
 go 1.23.8
 
 require (
+	github.com/a-h/templ v0.3.865
 	github.com/ethereum-optimism/optimism v1.13.2
 	github.com/ethereum/go-ethereum v1.15.11
 	github.com/golang-migrate/migrate/v4 v4.18.3
@@ -14,7 +15,6 @@ require (
 
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/a-h/templ v0.3.865
 	github.com/bits-and-blooms/bitset v1.20.0 // indirect
 	github.com/consensys/bavard v0.1.27 // indirect
 	github.com/consensys/gnark-crypto v0.16.0 // indirect
@@ -43,7 +43,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
