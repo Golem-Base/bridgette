@@ -291,7 +291,7 @@ templ UnmatchedDepositItem(deposit UnmatchedDeposit) {
 				<h4 class="text-xs font-medium text-gray-500 uppercase mb-1">L1 Deposit</h4>
 				<p class="text-sm">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
 				<p class="text-sm">Time: { formatTime(deposit.L1Timestamp) }</p>
-				<span class="text-sm text-blue-600">
+				<span class="text-sm text-blue-600 overflow-hidden text-ellipsis whitespace-nowrap block">
 					Tx: { shortenAddress(deposit.TxHashL1) }
 				</span>
 			</div>
@@ -318,7 +318,7 @@ templ DepositItem(deposit DepositPair) {
 					<h4 class="text-xs font-medium text-gray-500 uppercase mb-1">L1 Deposit</h4>
 					<p class="text-sm">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
 					<p class="text-sm">Time: { formatTime(deposit.L1Timestamp) }</p>
-					<span class="text-sm text-blue-600">
+					<span class="text-sm text-blue-600 overflow-hidden text-ellipsis whitespace-nowrap block">
 						Tx: { shortenAddress(deposit.TxHashL1) }
 					</span>
 				</div>
@@ -326,7 +326,7 @@ templ DepositItem(deposit DepositPair) {
 					<h4 class="text-xs font-medium text-gray-500 uppercase mb-1">L2 Confirmation</h4>
 					<p class="text-sm">Block: { fmt.Sprintf("%d", deposit.L2BlockNumber) }</p>
 					<p class="text-sm">Time: { formatTime(deposit.L2Timestamp) }</p>
-					<span class="text-sm text-blue-600">
+					<span class="text-sm text-blue-600 overflow-hidden text-ellipsis whitespace-nowrap block">
 						Tx: { shortenAddress(deposit.TxHashL2) }
 					</span>
 				</div>

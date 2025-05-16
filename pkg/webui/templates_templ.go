@@ -677,7 +677,7 @@ func UnmatchedDepositItem(deposit UnmatchedDeposit) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</p><span class=\"text-sm text-blue-600\">Tx: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</p><span class=\"text-sm text-blue-600 overflow-hidden text-ellipsis whitespace-nowrap block\">Tx: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -798,7 +798,7 @@ func DepositItem(deposit DepositPair) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</p><span class=\"text-sm text-blue-600\">Tx: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</p><span class=\"text-sm text-blue-600 overflow-hidden text-ellipsis whitespace-nowrap block\">Tx: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -837,7 +837,7 @@ func DepositItem(deposit DepositPair) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p><span class=\"text-sm text-blue-600\">Tx: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p><span class=\"text-sm text-blue-600 overflow-hidden text-ellipsis whitespace-nowrap block\">Tx: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

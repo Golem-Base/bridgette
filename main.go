@@ -142,7 +142,7 @@ func main() {
 			&cli.Uint64Flag{
 				Name:        "forwarding-batch-size",
 				Usage:       "The batch size for the forwarding",
-				Value:       100,
+				Value:       1000,
 				Destination: &cfg.forwardingBatchSize,
 			},
 		},
