@@ -12,6 +12,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Golem-Base/bridgette/pkg/sqlitestore"
@@ -24,18 +25,45 @@ const (
 
 // Server represents the web UI server
 type Server struct {
-	db     *sql.DB
-	logger *slog.Logger
-	addr   string
+	db         *sql.DB
+	logger     *slog.Logger
+	addr       string
+	pathPrefix string
 }
 
 // NewServer creates a new web UI server
-func NewServer(db *sql.DB, logger *slog.Logger, addr string) *Server {
+func NewServer(db *sql.DB, logger *slog.Logger, addr string, pathPrefix string) *Server {
 	return &Server{
-		db:     db,
-		logger: logger,
-		addr:   addr,
+		db:         db,
+		logger:     logger,
+		addr:       addr,
+		pathPrefix: pathPrefix,
 	}
+}
+
+// prefixPath adds the path prefix to a route if prefix is configured
+func (s *Server) prefixPath(path string) string {
+	if s.pathPrefix == "" {
+		return path
+	}
+	// Ensure pathPrefix starts with / but doesn't end with /
+	prefix := s.pathPrefix
+	if !strings.HasPrefix(prefix, "/") {
+		prefix = "/" + prefix
+	}
+	if strings.HasSuffix(prefix, "/") {
+		prefix = strings.TrimSuffix(prefix, "/")
+	}
+
+	// Handle root path specially
+	if path == "/" {
+		if prefix == "" {
+			return "/"
+		}
+		return prefix + "/"
+	}
+
+	return prefix + path
 }
 
 // Start starts the web UI server
@@ -43,26 +71,27 @@ func (s *Server) Start(ctx context.Context) error {
 	mux := http.NewServeMux()
 
 	// Register handlers
-	mux.HandleFunc("GET /", s.handleIndex)
+	mux.HandleFunc("GET "+s.prefixPath("/"), s.handleIndex)
 
 	// Dashboard component handlers
-	mux.HandleFunc("GET /dashboard/metrics", s.handleDashboardMetrics)
-	mux.HandleFunc("GET /dashboard/performance", s.handleBridgePerformance)
-	mux.HandleFunc("GET /dashboard/unmatched", s.handleUnmatchedDepositsSection)
-	mux.HandleFunc("GET /dashboard/timeline", s.handleDepositsTimelineSection)
+	mux.HandleFunc("GET "+s.prefixPath("/dashboard/metrics"), s.handleDashboardMetrics)
+	mux.HandleFunc("GET "+s.prefixPath("/dashboard/performance"), s.handleBridgePerformance)
+	mux.HandleFunc("GET "+s.prefixPath("/dashboard/unmatched"), s.handleUnmatchedDepositsSection)
+	mux.HandleFunc("GET "+s.prefixPath("/dashboard/timeline"), s.handleDepositsTimelineSection)
 
 	// API endpoints
-	mux.HandleFunc("GET /api/chart-data", s.handleTimeSeriesData)
+	mux.HandleFunc("GET "+s.prefixPath("/api/chart-data"), s.handleTimeSeriesData)
 
 	// Static files
-	mux.Handle("GET /static/", http.StripPrefix("/static/", createStaticHandler()))
+	staticPath := s.prefixPath("/static/")
+	mux.Handle("GET "+staticPath, http.StripPrefix(staticPath, createStaticHandler()))
 
 	server := &http.Server{
 		Addr:    s.addr,
 		Handler: mux,
 	}
 
-	s.logger.Info("starting web UI server", "addr", s.addr)
+	s.logger.Info("starting web UI server", "addr", s.addr, "pathPrefix", s.pathPrefix)
 
 	errCh := make(chan error, 1)
 	go func() {
@@ -80,7 +109,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 // handleIndex handles the index page
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
-	component := Dashboard()
+	component := Dashboard(s.pathPrefix)
 	err := component.Render(r.Context(), w)
 	if err != nil {
 		s.logger.Error("failed to render dashboard", "error", err)
@@ -98,7 +127,7 @@ func (s *Server) handleDashboardMetrics(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	component := DashboardMetrics(stats)
+	component := DashboardMetrics(stats, s.pathPrefix)
 	err = component.Render(r.Context(), w)
 	if err != nil {
 		s.logger.Error("failed to render dashboard metrics", "error", err)
@@ -116,7 +145,7 @@ func (s *Server) handleBridgePerformance(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	component := BridgePerformance(stats)
+	component := BridgePerformance(stats, s.pathPrefix)
 	err = component.Render(r.Context(), w)
 	if err != nil {
 		s.logger.Error("failed to render bridge performance", "error", err)
@@ -220,7 +249,7 @@ func (s *Server) handleUnmatchedDepositsSection(w http.ResponseWriter, r *http.R
 
 	totalPages := int(math.Ceil(float64(totalCount) / float64(ItemsPerPage)))
 
-	component := UnmatchedDepositsSection(deposits, page, totalPages)
+	component := UnmatchedDepositsSection(deposits, page, totalPages, s.pathPrefix)
 	err = component.Render(r.Context(), w)
 	if err != nil {
 		s.logger.Error("failed to render unmatched deposits section", "error", err)
@@ -258,7 +287,7 @@ func (s *Server) handleDepositsTimelineSection(w http.ResponseWriter, r *http.Re
 
 	totalPages := int(math.Ceil(float64(totalCount) / float64(ItemsPerPage)))
 
-	component := DepositsTimelineSection(deposits, page, totalPages)
+	component := DepositsTimelineSection(deposits, page, totalPages, s.pathPrefix)
 	err = component.Render(r.Context(), w)
 	if err != nil {
 		s.logger.Error("failed to render deposits timeline section", "error", err)

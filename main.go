@@ -64,13 +64,13 @@ func main() {
 		l1ExecutionURL       string
 		l2ExecutionURL       string
 		dbURL                string
-		addr                 string
 		l1BridgeAddress      string
 		webUIAddr            string
 		l1BlockInterval      time.Duration
 		l2BlockInterval      time.Duration
 		backfillingBatchSize uint64
 		forwardingBatchSize  uint64
+		pathPrefix           string
 	}{}
 
 	app := &cli.App{
@@ -98,13 +98,7 @@ func main() {
 				Destination: &cfg.dbURL,
 				Value:       "file:./store/bridgette.db?_txlock=immediate&_auto_vacuum=2&_journal_mode=WAL&_busy_timeout=5000&_foreign_keys=true",
 			},
-			&cli.StringFlag{
-				Name:        "addr",
-				Usage:       "The address to listen on",
-				EnvVars:     []string{"ADDR"},
-				Value:       ":8084",
-				Destination: &cfg.addr,
-			},
+
 			&cli.StringFlag{
 				Name:        "l1-bridge-address",
 				Usage:       "The address of the L1 bridge",
@@ -137,13 +131,22 @@ func main() {
 				Name:        "backfilling-batch-size",
 				Usage:       "The batch size for the backfilling",
 				Value:       10000,
+				EnvVars:     []string{"BACKFILLING_BATCH_SIZE"},
 				Destination: &cfg.backfillingBatchSize,
 			},
 			&cli.Uint64Flag{
 				Name:        "forwarding-batch-size",
 				Usage:       "The batch size for the forwarding",
 				Value:       1000,
+				EnvVars:     []string{"FORWARDING_BATCH_SIZE"},
 				Destination: &cfg.forwardingBatchSize,
+			},
+			&cli.StringFlag{
+				Name:        "path-prefix",
+				Usage:       "The prefix for the path",
+				Value:       "",
+				EnvVars:     []string{"PATH_PREFIX"},
+				Destination: &cfg.pathPrefix,
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -969,7 +972,7 @@ func main() {
 			})
 
 			// Add web UI server
-			webServer := webui.NewServer(db, log.With("component", "webui"), cfg.webUIAddr)
+			webServer := webui.NewServer(db, log.With("component", "webui"), cfg.webUIAddr, cfg.pathPrefix)
 			eg.Go(func() error {
 				return webServer.Start(egCtx)
 			})
