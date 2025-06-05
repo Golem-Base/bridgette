@@ -5,17 +5,33 @@ import (
 	"time"
 )
 
-templ Layout(title string) {
+// Helper function to prefix URLs with pathPrefix
+func prefixURL(pathPrefix, url string) string {
+	if pathPrefix == "" {
+		return url
+	}
+	// Ensure pathPrefix starts with / but doesn't end with /
+	prefix := pathPrefix
+	if prefix[0] != '/' {
+		prefix = "/" + prefix
+	}
+	if prefix[len(prefix)-1] == '/' {
+		prefix = prefix[:len(prefix)-1]
+	}
+	return prefix + url
+}
+
+templ Layout(title string, pathPrefix string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title } - Golem Bridge Monitor</title>
-			<script src="/static/js/htmx.min.js"></script>
-			<script src="/static/js/morphdom.min.js"></script>
-			<script src="/static/js/morphdom-swap.js"></script>
-			<script src="/static/js/tailwind.min.js"></script>
+			<script src={ prefixURL(pathPrefix, "/static/js/htmx.min.js") }></script>
+			<script src={ prefixURL(pathPrefix, "/static/js/morphdom.min.js") }></script>
+			<script src={ prefixURL(pathPrefix, "/static/js/morphdom-swap.js") }></script>
+			<script src={ prefixURL(pathPrefix, "/static/js/tailwind.min.js") }></script>
 			<style>
 				:root {
 					--golem-primary: #1a3ad3;
@@ -94,23 +110,23 @@ templ Layout(title string) {
 }
 
 // Dashboard is the main page template
-templ Dashboard() {
-	@Layout("Dashboard") {
+templ Dashboard(pathPrefix string) {
+	@Layout("Dashboard", pathPrefix) {
 		<div class="space-y-8">
-			<div id="dashboard-metrics" hx-get="/dashboard/metrics" hx-trigger="load"></div>
-			<div id="bridge-performance" hx-get="/dashboard/performance" hx-trigger="load"></div>
+			<div id="dashboard-metrics" hx-get={ prefixURL(pathPrefix, "/dashboard/metrics") } hx-trigger="load"></div>
+			<div id="bridge-performance" hx-get={ prefixURL(pathPrefix, "/dashboard/performance") } hx-trigger="load"></div>
 			<div>
-				@TimeSeriesChart()
+				@TimeSeriesChart(pathPrefix)
 			</div>
-			<div id="unmatched-deposits-section" hx-get="/dashboard/unmatched" hx-trigger="load"></div>
-			<div id="deposits-timeline-section" hx-get="/dashboard/timeline" hx-trigger="load"></div>
+			<div id="unmatched-deposits-section" hx-get={ prefixURL(pathPrefix, "/dashboard/unmatched") } hx-trigger="load"></div>
+			<div id="deposits-timeline-section" hx-get={ prefixURL(pathPrefix, "/dashboard/timeline") } hx-trigger="load"></div>
 		</div>
 	}
 }
 
 // DashboardMetrics contains the metrics cards
-templ DashboardMetrics(stats map[string]interface{}) {
-	<div hx-get="/dashboard/metrics" hx-trigger="every 2s" hx-swap="morphdom" hx-swap="outerHTML">
+templ DashboardMetrics(stats map[string]interface{}, pathPrefix string) {
+	<div hx-get={ prefixURL(pathPrefix, "/dashboard/metrics") } hx-trigger="every 2s" hx-swap="morphdom" hx-swap="outerHTML">
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 			<div class="golem-card">
 				<h3 class="text-lg font-semibold mb-2">Total Matched Deposits</h3>
@@ -161,8 +177,8 @@ templ DashboardMetrics(stats map[string]interface{}) {
 }
 
 // BridgePerformance contains the bridge performance stats
-templ BridgePerformance(stats map[string]interface{}) {
-	<div class="golem-card" hx-get="/dashboard/performance" hx-trigger="every 3s" hx-swap="morphdom" hx-swap="outerHTML">
+templ BridgePerformance(stats map[string]interface{}, pathPrefix string) {
+	<div class="golem-card" hx-get={ prefixURL(pathPrefix, "/dashboard/performance") } hx-trigger="every 3s" hx-swap="morphdom" hx-swap="outerHTML">
 		<h2 class="text-xl font-bold mb-4">Bridge Performance</h2>
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 			<div>
@@ -182,8 +198,8 @@ templ BridgePerformance(stats map[string]interface{}) {
 }
 
 // UnmatchedDepositsSection contains the unmatched deposits section
-templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int) {
-	<div class="golem-card" hx-get={ fmt.Sprintf("/dashboard/unmatched?page=%d", page) } hx-trigger="every 2s" hx-swap="morphdom" hx-swap="outerHTML">
+templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int, pathPrefix string) {
+	<div class="golem-card" hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page)) } hx-trigger="every 2s" hx-swap="morphdom" hx-swap="outerHTML">
 		<div class="mb-6">
 			<h2 class="text-xl font-bold text-amber-600">Unmatched Deposits</h2>
 			<p class="text-sm text-gray-600">Deposits waiting for L2 confirmation</p>
@@ -206,7 +222,7 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 					if page > 1 {
 						<button
 							class="golem-button"
-							hx-get={ fmt.Sprintf("/dashboard/unmatched?page=%d", page-1) }
+							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page-1)) }
 							hx-target="closest .golem-card"
 							hx-swap="morphdom"
 						>
@@ -216,7 +232,7 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 					if page < totalPages {
 						<button
 							class="golem-button"
-							hx-get={ fmt.Sprintf("/dashboard/unmatched?page=%d", page+1) }
+							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page+1)) }
 							hx-target="closest .golem-card"
 							hx-swap="morphdom"
 						>
@@ -230,8 +246,8 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 }
 
 // DepositsTimelineSection contains the deposits timeline section
-templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int) {
-	<div class="golem-card" hx-get={ fmt.Sprintf("/dashboard/timeline?page=%d", page) } hx-trigger="every 5s" hx-swap="morphdom" hx-swap="outerHTML">
+templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int, pathPrefix string) {
+	<div class="golem-card" hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page)) } hx-trigger="every 5s" hx-swap="morphdom" hx-swap="outerHTML">
 		<div class="mb-6">
 			<h2 class="text-xl font-bold">Deposit Timeline</h2>
 		</div>
@@ -253,7 +269,7 @@ templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int) {
 					if page > 1 {
 						<button
 							class="golem-button"
-							hx-get={ fmt.Sprintf("/dashboard/timeline?page=%d", page-1) }
+							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page-1)) }
 							hx-target="closest .golem-card"
 							hx-swap="morphdom"
 						>
@@ -263,7 +279,7 @@ templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int) {
 					if page < totalPages {
 						<button
 							class="golem-button"
-							hx-get={ fmt.Sprintf("/dashboard/timeline?page=%d", page+1) }
+							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page+1)) }
 							hx-target="closest .golem-card"
 							hx-swap="morphdom"
 						>
@@ -339,14 +355,14 @@ templ DepositItem(deposit DepositPair) {
 }
 
 // TimeSeriesChart displays a chart of deposit time differences over time
-templ TimeSeriesChart() {
+templ TimeSeriesChart(pathPrefix string) {
 	<div class="golem-card" hx-swap="morphdom">
 		<h2 class="text-xl font-bold mb-4">Deposit Confirmation Times</h2>
 		<div class="relative h-96">
 			<canvas id="timeSeriesChart"></canvas>
 		</div>
-		<script src="/static/js/chart.min.js"></script>
-		<script src="/static/js/chartjs-adapter-date-fns.min.js"></script>
+		<script src={ prefixURL(pathPrefix, "/static/js/chart.min.js") }></script>
+		<script src={ prefixURL(pathPrefix, "/static/js/chartjs-adapter-date-fns.min.js") }></script>
 		<script>
 			// Chart instance to enable updates
 			let timeSeriesChart;
@@ -421,7 +437,7 @@ templ TimeSeriesChart() {
 
 			// Function to fetch data and update the chart
 			function updateChart() {
-				fetch('/api/chart-data')
+				fetch('{{ prefixURL(pathPrefix, "/api/chart-data") }}')
 					.then(response => response.json())
 					.then(data => {
 						// Create dataset with proper timestamp objects
