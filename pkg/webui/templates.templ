@@ -273,7 +273,7 @@ templ Layout(title string, pathPrefix string) {
 			
 			<footer class="py-6 mt-12 border-t border-white/20 bg-black/10 backdrop-blur-sm">
 				<div class="container mx-auto px-4">
-					<p class="text-center text-white/80">© { time.Now().Year() } Golem Network. All rights reserved.</p>
+					<p class="text-center text-white/80">© { time.Now().Year() } Golem Base. All rights reserved.</p>
 				</div>
 			</footer>
 		</body>
@@ -547,11 +547,17 @@ templ TimeSeriesChart(pathPrefix string) {
 						datasets: [{
 							label: 'Confirmation Time (seconds)',
 							data: [],
-							backgroundColor: 'rgba(26, 58, 211, 0.1)',
-							borderColor: '#1a3ad3',
-							borderWidth: 1,
+							backgroundColor: 'rgba(255, 255, 255, 0.2)',
+							borderColor: '#ffffff',
+							borderWidth: 3,
 							pointStyle: 'circle',
-							pointRadius: 2,									
+							pointRadius: 4,
+							pointBackgroundColor: '#ffffff',
+							pointBorderColor: '#60a5fa',
+							pointBorderWidth: 2,
+							pointHoverRadius: 6,
+							pointHoverBackgroundColor: '#fbbf24',
+							pointHoverBorderColor: '#ffffff',
 							tension: 0.05,
 							fill: true
 						}]
@@ -567,6 +573,11 @@ templ TimeSeriesChart(pathPrefix string) {
 								display: false
 							},
 							tooltip: {
+								backgroundColor: 'rgba(0, 0, 0, 0.8)',
+								titleColor: '#ffffff',
+								bodyColor: '#ffffff',
+								borderColor: '#ffffff',
+								borderWidth: 1,
 								callbacks: {
 									title: function(context) {
 										// Simply format the x value directly
@@ -583,9 +594,16 @@ templ TimeSeriesChart(pathPrefix string) {
 							y: {
 								title: {
 									display: true,
-									text: 'Seconds'
+									text: 'Seconds',
+									color: '#ffffff'
 								},
-								beginAtZero: true
+								beginAtZero: true,
+								ticks: {
+									color: '#ffffff'
+								},
+								grid: {
+									color: 'rgba(255, 255, 255, 0.2)'
+								}
 							},
 							x: {
 								type: 'time',
@@ -598,7 +616,14 @@ templ TimeSeriesChart(pathPrefix string) {
 								},
 								title: {
 									display: true,
-									text: 'Date'
+									text: 'Date',
+									color: '#ffffff'
+								},
+								ticks: {
+									color: '#ffffff'
+								},
+								grid: {
+									color: 'rgba(255, 255, 255, 0.2)'
 								}
 							}
 						}
