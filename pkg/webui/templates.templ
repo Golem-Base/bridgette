@@ -1,9 +1,6 @@
 package webui
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
 // Helper function to prefix URLs with pathPrefix
 func prefixURL(pathPrefix, url string) string {
@@ -351,16 +348,14 @@ templ Layout(title string, pathPrefix string) {
 					<p class="subtitle">Cross-chain Transaction Tracking</p>
 				</div>
 			</header>
-
 			<main>
 				{ children... }
 			</main>
-
 			<footer>
 				<div class="container">
 					<div class="footer-logo">[ ARKIV ]</div>
-					<p>Powered by <a href="https://www.golem.network/" target="_blank">Golem Network</a></p>
-					<p style="margin-top: 8px;">© { time.Now().Year() } Arkiv. All rights reserved.</p>
+					<p>Powered by <a href="https://arkiv.network" target="_blank">Arkiv Network</a></p>
+					<p style="margin-top: 8px;">© 2025 Arkiv Network. All rights reserved.</p>
 				</div>
 			</footer>
 		</body>
@@ -496,8 +491,8 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page-1)) }
-							hx-target="closest div"
-							hx-swap="morphdom"
+							hx-target="#unmatched-deposits-section"
+							hx-swap="innerHTML"
 						>
 							Previous
 						</button>
@@ -506,8 +501,8 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page+1)) }
-							hx-target="closest div"
-							hx-swap="morphdom"
+							hx-target="#unmatched-deposits-section"
+							hx-swap="innerHTML"
 						>
 							Next
 						</button>
@@ -541,8 +536,8 @@ templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int, path
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page-1)) }
-							hx-target="closest div"
-							hx-swap="morphdom"
+							hx-target="#deposits-timeline-section"
+							hx-swap="innerHTML"
 						>
 							Previous
 						</button>
@@ -551,8 +546,8 @@ templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int, path
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page+1)) }
-							hx-target="closest div"
-							hx-swap="morphdom"
+							hx-target="#deposits-timeline-section"
+							hx-swap="innerHTML"
 						>
 							Next
 						</button>
@@ -620,12 +615,12 @@ templ TimeSeriesChart(pathPrefix string) {
 	<div hx-swap="morphdom">
 		<h2 class="section-title">Deposit Confirmation Times</h2>
 		<div class="golem-card">
-		<div style="position: relative; height: 400px;">
-			<canvas id="timeSeriesChart"></canvas>
-		</div>
-		<script src={ prefixURL(pathPrefix, "/static/js/chart.min.js") }></script>
-		<script src={ prefixURL(pathPrefix, "/static/js/chartjs-adapter-date-fns.min.js") }></script>
-		<script>
+			<div style="position: relative; height: 400px;">
+				<canvas id="timeSeriesChart"></canvas>
+			</div>
+			<script src={ prefixURL(pathPrefix, "/static/js/chart.min.js") }></script>
+			<script src={ prefixURL(pathPrefix, "/static/js/chartjs-adapter-date-fns.min.js") }></script>
+			<script>
 			// Chart instance to enable updates
 			let timeSeriesChart;
 

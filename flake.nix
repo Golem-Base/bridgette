@@ -21,7 +21,7 @@
           '';
           hardeningDisable = [ "all" ];
 
-          packages = with pkgs; [ go sqlite sqlc ];
+          packages = with pkgs; [ go sqlite sqlc okteto kubectl kubelogin-oidc ];
         };
       });
     };

@@ -8,10 +8,7 @@ package webui
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
 // Helper function to prefix URLs with pathPrefix
 func prefixURL(pathPrefix, url string) string {
@@ -57,7 +54,7 @@ func Layout(title string, pathPrefix string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 30, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 27, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -70,7 +67,7 @@ func Layout(title string, pathPrefix string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/htmx.min.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 31, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 28, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -83,7 +80,7 @@ func Layout(title string, pathPrefix string) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/morphdom.min.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 32, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 29, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -96,7 +93,7 @@ func Layout(title string, pathPrefix string) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/morphdom-swap.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 33, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 30, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -109,7 +106,7 @@ func Layout(title string, pathPrefix string) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/tailwind.min.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 34, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 31, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -123,20 +120,7 @@ func Layout(title string, pathPrefix string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</main><footer><div class=\"container\"><div class=\"footer-logo\">[ ARKIV ]</div><p>Powered by <a href=\"https://www.golem.network/\" target=\"_blank\">Golem Network</a></p><p style=\"margin-top: 8px;\">© ")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Year())
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 363, Col: 55}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " Arkiv. All rights reserved.</p></div></footer></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</main><footer><div class=\"container\"><div class=\"footer-logo\">[ ARKIV ]</div><p>Powered by <a href=\"https://arkiv.network\" target=\"_blank\">Arkiv Network</a></p><p style=\"margin-top: 8px;\">© 2025 Arkiv Network. All rights reserved.</p></div></footer></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -161,12 +145,12 @@ func Dashboard(pathPrefix string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var9 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var8 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -178,33 +162,33 @@ func Dashboard(pathPrefix string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<section><div class=\"container\"><div id=\"dashboard-metrics\" hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<section><div class=\"container\"><div id=\"dashboard-metrics\" hx-get=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/metrics"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 370, Col: 84}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-trigger=\"load\"></div></div></section><section><div class=\"container\"><div id=\"bridge-performance\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/metrics"))
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/performance"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 375, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 375, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-trigger=\"load\"></div></div></section><section><div class=\"container\"><div id=\"bridge-performance\" hx-get=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/performance"))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 380, Col: 89}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-trigger=\"load\"></div></div></section><section><div class=\"container\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-trigger=\"load\"></div></div></section><section><div class=\"container\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -212,39 +196,39 @@ func Dashboard(pathPrefix string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></section><section><div class=\"container\"><div id=\"unmatched-deposits-section\" hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></section><section><div class=\"container\"><div id=\"unmatched-deposits-section\" hx-get=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/unmatched"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 385, Col: 95}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-trigger=\"load\"></div></div></section><section><div class=\"container\"><div id=\"deposits-timeline-section\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/unmatched"))
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/timeline"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 390, Col: 95}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 390, Col: 93}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-trigger=\"load\"></div></div></section><section><div class=\"container\"><div id=\"deposits-timeline-section\" hx-get=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/timeline"))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 395, Col: 93}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-trigger=\"load\"></div></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-trigger=\"load\"></div></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Layout("Dashboard", pathPrefix).Render(templ.WithChildren(ctx, templ_7745c5c3_Var9), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout("Dashboard", pathPrefix).Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -269,129 +253,129 @@ func DashboardMetrics(stats map[string]interface{}, pathPrefix string) templ.Com
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var14 == nil {
-			templ_7745c5c3_Var14 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/metrics"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 398, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-trigger=\"every 2s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Network Metrics</h2><div class=\"card-grid\" style=\"margin-bottom: 32px;\"><div class=\"metric-card\"><div class=\"metric-label\">Total Matched Deposits</div><div class=\"metric-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var15 string
-		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/metrics"))
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["total_matched"].(int)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 403, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 403, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-trigger=\"every 2s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Network Metrics</h2><div class=\"card-grid\" style=\"margin-bottom: 32px;\"><div class=\"metric-card\"><div class=\"metric-label\">Total Matched Deposits</div><div class=\"metric-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Average Confirmation Time</div><div class=\"metric-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["total_matched"].(int)))
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 408, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 407, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Average Confirmation Time</div><div class=\"metric-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Total Bridged ETH</div><div class=\"metric-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)))
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.4f ETH", stats["total_bridged_eth"].(float64)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 412, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 411, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Total Bridged ETH</div><div class=\"metric-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div></div><div class=\"card-grid\"><div class=\"metric-card\" style=\"border: 2px solid var(--arkiv-orange);\"><div class=\"metric-label\" style=\"color: var(--arkiv-orange);\">Unmatched Deposits</div><div class=\"metric-value\" style=\"color: var(--arkiv-orange);\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.4f ETH", stats["total_bridged_eth"].(float64)))
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["pending_deposits"].(int)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 416, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 417, Col: 118}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div></div><div class=\"card-grid\"><div class=\"metric-card\" style=\"border: 2px solid var(--arkiv-orange);\"><div class=\"metric-label\" style=\"color: var(--arkiv-orange);\">Unmatched Deposits</div><div class=\"metric-value\" style=\"color: var(--arkiv-orange);\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div><div class=\"metric-card\"><div class=\"metric-label\" style=\"margin-bottom: 16px;\">Latest L1 Block</div><div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px;\"><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Block Number</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["pending_deposits"].(int)))
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["latest_l1_block"].(int)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 422, Col: 118}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 424, Col: 130}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></div><div class=\"metric-card\"><div class=\"metric-label\" style=\"margin-bottom: 16px;\">Latest L1 Block</div><div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px;\"><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Block Number</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></div><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Time Since</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["latest_l1_block"].(int)))
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["l1_time_since"].(float64)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 429, Col: 130}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 428, Col: 138}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Time Since</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div></div></div><div class=\"metric-card\"><div class=\"metric-label\" style=\"margin-bottom: 16px;\">Latest L2 Block</div><div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px;\"><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Block Number</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["l1_time_since"].(float64)))
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["latest_l2_block"].(int)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 433, Col: 138}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 437, Col: 130}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div></div></div><div class=\"metric-card\"><div class=\"metric-label\" style=\"margin-bottom: 16px;\">Latest L2 Block</div><div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px;\"><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Block Number</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Time Since</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", stats["latest_l2_block"].(int)))
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["l2_time_since"].(float64)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 442, Col: 130}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 441, Col: 138}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div><div><div style=\"font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;\">Time Since</div><div style=\"font-size: 1.125rem; font-weight: 700; color: var(--black);\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["l2_time_since"].(float64)))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 446, Col: 138}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div></div></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -416,64 +400,64 @@ func BridgePerformance(stats map[string]interface{}, pathPrefix string) templ.Co
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var24 == nil {
-			templ_7745c5c3_Var24 = templ.NopComponent
+		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var23 == nil {
+			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var24 string
+		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/performance"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 451, Col: 62}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" hx-trigger=\"every 3s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Bridge Performance</h2><div class=\"card-grid\"><div class=\"metric-card\"><div class=\"metric-label\">Minimum Time</div><div class=\"metric-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/dashboard/performance"))
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["min_time_diff"].(float64)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 456, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 456, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-trigger=\"every 3s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Bridge Performance</h2><div class=\"card-grid\"><div class=\"metric-card\"><div class=\"metric-label\">Minimum Time</div><div class=\"metric-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Average Time</div><div class=\"metric-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["min_time_diff"].(float64)))
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 461, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 460, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Average Time</div><div class=\"metric-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Maximum Time</div><div class=\"metric-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)))
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["max_time_diff"].(float64)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 465, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 464, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div></div><div class=\"metric-card\"><div class=\"metric-label\">Maximum Time</div><div class=\"metric-value\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.1f sec", stats["max_time_diff"].(float64)))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 469, Col: 89}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -498,30 +482,30 @@ func UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int,
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var29 == nil {
-			templ_7745c5c3_Var29 = templ.NopComponent
+		templ_7745c5c3_Var28 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var28 == nil {
+			templ_7745c5c3_Var28 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var30 string
-		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page)))
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 477, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 472, Col: 87}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" hx-trigger=\"every 2s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Unmatched Deposits</h2><p style=\"font-size: 14px; color: var(--gray-neutral); margin-bottom: 32px;\">Deposits waiting for L2 confirmation</p><div class=\"timeline-container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" hx-trigger=\"every 2s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Unmatched Deposits</h2><p style=\"font-size: 14px; color: var(--gray-neutral); margin-bottom: 32px;\">Deposits waiting for L2 confirmation</p><div class=\"timeline-container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(deposits) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<p style=\"text-align: center; padding: 3rem 0; color: var(--gray-neutral);\">No unmatched deposits found</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<p style=\"text-align: center; padding: 3rem 0; color: var(--gray-neutral);\">No unmatched deposits found</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -533,72 +517,72 @@ func UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int,
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if totalPages > 1 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div style=\"display: flex; justify-content: space-between; align-items: center; margin-top: 32px;\"><div><span style=\"font-size: 14px; color: var(--gray-neutral);\">Page ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div style=\"display: flex; justify-content: space-between; align-items: center; margin-top: 32px;\"><div><span style=\"font-size: 14px; color: var(--gray-neutral);\">Page ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var31 string
-			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d of %d", page, totalPages))
+			var templ_7745c5c3_Var30 string
+			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d of %d", page, totalPages))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 492, Col: 112}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 487, Col: 112}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</span></div><div style=\"display: flex; gap: 12px;\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</span></div><div style=\"display: flex; gap: 12px;\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if page > 1 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<button class=\"golem-button\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<button class=\"golem-button\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var32 string
-				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page-1)))
+				var templ_7745c5c3_Var31 string
+				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page-1)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 498, Col: 90}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 493, Col: 90}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" hx-target=\"closest div\" hx-swap=\"morphdom\">Previous</button> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" hx-target=\"#unmatched-deposits-section\" hx-swap=\"innerHTML\">Previous</button> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if page < totalPages {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<button class=\"golem-button\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<button class=\"golem-button\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var33 string
-				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page+1)))
+				var templ_7745c5c3_Var32 string
+				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page+1)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 508, Col: 90}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 503, Col: 90}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" hx-target=\"closest div\" hx-swap=\"morphdom\">Next</button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" hx-target=\"#unmatched-deposits-section\" hx-swap=\"innerHTML\">Next</button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -623,30 +607,30 @@ func DepositsTimelineSection(deposits []DepositPair, page, totalPages int, pathP
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var34 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var34 == nil {
-			templ_7745c5c3_Var34 = templ.NopComponent
+		templ_7745c5c3_Var33 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var33 == nil {
+			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var35 string
-		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page)))
+		var templ_7745c5c3_Var34 string
+		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 523, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 518, Col: 86}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" hx-trigger=\"every 5s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Deposit Timeline</h2><div class=\"timeline-container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" hx-trigger=\"every 5s\" hx-swap=\"morphdom\" hx-swap=\"outerHTML\"><h2 class=\"section-title\">Deposit Timeline</h2><div class=\"timeline-container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(deposits) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<p style=\"text-align: center; padding: 3rem 0; color: var(--gray-neutral);\">No deposits found</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<p style=\"text-align: center; padding: 3rem 0; color: var(--gray-neutral);\">No deposits found</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -658,72 +642,72 @@ func DepositsTimelineSection(deposits []DepositPair, page, totalPages int, pathP
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if totalPages > 1 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<div style=\"display: flex; justify-content: space-between; align-items: center; margin-top: 32px;\"><div><span style=\"font-size: 14px; color: var(--gray-neutral);\">Page ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div style=\"display: flex; justify-content: space-between; align-items: center; margin-top: 32px;\"><div><span style=\"font-size: 14px; color: var(--gray-neutral);\">Page ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var36 string
-			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d of %d", page, totalPages))
+			var templ_7745c5c3_Var35 string
+			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d of %d", page, totalPages))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 537, Col: 112}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 532, Col: 112}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</span></div><div style=\"display: flex; gap: 12px;\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</span></div><div style=\"display: flex; gap: 12px;\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if page > 1 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<button class=\"golem-button\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<button class=\"golem-button\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var37 string
-				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page-1)))
+				var templ_7745c5c3_Var36 string
+				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page-1)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 543, Col: 89}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 538, Col: 89}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" hx-target=\"closest div\" hx-swap=\"morphdom\">Previous</button> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\" hx-target=\"#deposits-timeline-section\" hx-swap=\"innerHTML\">Previous</button> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if page < totalPages {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<button class=\"golem-button\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<button class=\"golem-button\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var38 string
-				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page+1)))
+				var templ_7745c5c3_Var37 string
+				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page+1)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 553, Col: 89}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 548, Col: 89}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" hx-target=\"closest div\" hx-swap=\"morphdom\">Next</button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" hx-target=\"#deposits-timeline-section\" hx-swap=\"innerHTML\">Next</button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -748,103 +732,103 @@ func UnmatchedDepositItem(deposit UnmatchedDeposit) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var39 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var39 == nil {
-			templ_7745c5c3_Var39 = templ.NopComponent
+		templ_7745c5c3_Var38 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var38 == nil {
+			templ_7745c5c3_Var38 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<div class=\"golem-card\" style=\"border-left: 4px solid var(--arkiv-orange);\"><div style=\"display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;\"><div><h3 style=\"font-size: 1.25rem; font-weight: 700; color: var(--black); margin-bottom: 8px;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"golem-card\" style=\"border-left: 4px solid var(--arkiv-orange);\"><div style=\"display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;\"><div><h3 style=\"font-size: 1.25rem; font-weight: 700; color: var(--black); margin-bottom: 8px;\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var39 string
+		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.4f ETH", deposit.Amount))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 566, Col: 136}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</h3><p style=\"font-size: 14px; color: var(--gray-neutral); margin-bottom: 4px;\">From: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var40 string
-		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.4f ETH", deposit.Amount))
+		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.FromAddress))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 571, Col: 136}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 567, Col: 123}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</h3><p style=\"font-size: 14px; color: var(--gray-neutral); margin-bottom: 4px;\">From: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</p><p style=\"font-size: 14px; color: var(--gray-neutral);\">To: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var41 string
-		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.FromAddress))
+		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.ToAddress))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 572, Col: 123}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 568, Col: 99}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</p><p style=\"font-size: 14px; color: var(--gray-neutral);\">To: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</p></div><div style=\"padding: 8px 16px; border-radius: 24px; background: rgba(254, 116, 69, 0.1); border: 1px solid var(--arkiv-orange); color: var(--arkiv-orange); font-size: 12px; font-weight: 700; text-transform: uppercase;\">Waiting: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var42 string
-		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.ToAddress))
+		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(formatTimeDiff(deposit.TimeSinceSeconds))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 573, Col: 99}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 571, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</p></div><div style=\"padding: 8px 16px; border-radius: 24px; background: rgba(254, 116, 69, 0.1); border: 1px solid var(--arkiv-orange); color: var(--arkiv-orange); font-size: 12px; font-weight: 700; text-transform: uppercase;\">Waiting: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div></div><div><h4 style=\"font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;\">L1 Deposit</h4><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Block: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var43 string
-		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(formatTimeDiff(deposit.TimeSinceSeconds))
+		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", deposit.L1BlockNumber))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 576, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 576, Col: 121}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</div></div><div><h4 style=\"font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;\">L1 Deposit</h4><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Block: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</p><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Time: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var44 string
-		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", deposit.L1BlockNumber))
+		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(deposit.L1Timestamp))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 581, Col: 121}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 577, Col: 111}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</p><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Time: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</p><p style=\"font-size: 14px; color: var(--arkiv-blue); word-break: break-all;\">Tx: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var45 string
-		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(deposit.L1Timestamp))
+		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.TxHashL1))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 582, Col: 111}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 578, Col: 118}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p><p style=\"font-size: 14px; color: var(--arkiv-blue); word-break: break-all;\">Tx: ")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var46 string
-		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.TxHashL1))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 583, Col: 118}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</p></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -869,142 +853,142 @@ func DepositItem(deposit DepositPair) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var47 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var47 == nil {
-			templ_7745c5c3_Var47 = templ.NopComponent
+		templ_7745c5c3_Var46 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var46 == nil {
+			templ_7745c5c3_Var46 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<div class=\"golem-card\"><div style=\"display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;\"><div><h3 style=\"font-size: 1.25rem; font-weight: 700; color: var(--black); margin-bottom: 8px;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<div class=\"golem-card\"><div style=\"display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;\"><div><h3 style=\"font-size: 1.25rem; font-weight: 700; color: var(--black); margin-bottom: 8px;\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var47 string
+		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.4f ETH", deposit.Amount))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 588, Col: 136}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</h3><p style=\"font-size: 14px; color: var(--gray-neutral); margin-bottom: 4px;\">From: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var48 string
-		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.4f ETH", deposit.Amount))
+		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.FromAddress))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 593, Col: 136}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 589, Col: 123}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</h3><p style=\"font-size: 14px; color: var(--gray-neutral); margin-bottom: 4px;\">From: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</p><p style=\"font-size: 14px; color: var(--gray-neutral);\">To: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var49 string
-		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.FromAddress))
+		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.ToAddress))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 594, Col: 123}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 590, Col: 99}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</p><p style=\"font-size: 14px; color: var(--gray-neutral);\">To: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</p></div><div style=\"padding: 8px 16px; border-radius: 24px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; font-size: 12px; font-weight: 700; text-transform: uppercase;\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var50 string
-		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.ToAddress))
+		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(formatTimeDiff(deposit.TimeDiffSeconds))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 595, Col: 99}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 593, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "</p></div><div style=\"padding: 8px 16px; border-radius: 24px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; font-size: 12px; font-weight: 700; text-transform: uppercase;\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "</div></div><div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 24px;\"><div><h4 style=\"font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;\">L1 Deposit</h4><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Block: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var51 string
-		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(formatTimeDiff(deposit.TimeDiffSeconds))
+		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", deposit.L1BlockNumber))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 598, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 599, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</div></div><div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 24px;\"><div><h4 style=\"font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;\">L1 Deposit</h4><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Block: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</p><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Time: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var52 string
-		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", deposit.L1BlockNumber))
+		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(deposit.L1Timestamp))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 604, Col: 122}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 600, Col: 112}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "</p><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Time: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "</p><p style=\"font-size: 14px; color: var(--arkiv-blue); word-break: break-all;\">Tx: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var53 string
-		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(deposit.L1Timestamp))
+		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.TxHashL1))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 605, Col: 112}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 601, Col: 119}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</p><p style=\"font-size: 14px; color: var(--arkiv-blue); word-break: break-all;\">Tx: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</p></div><div><h4 style=\"font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;\">L2 Confirmation</h4><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Block: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var54 string
-		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.TxHashL1))
+		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", deposit.L2BlockNumber))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 606, Col: 119}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 605, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</p></div><div><h4 style=\"font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;\">L2 Confirmation</h4><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Block: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</p><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Time: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var55 string
-		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", deposit.L2BlockNumber))
+		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(deposit.L2Timestamp))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 610, Col: 122}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 606, Col: 112}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</p><p style=\"font-size: 14px; color: var(--black); margin-bottom: 4px;\">Time: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</p><p style=\"font-size: 14px; color: var(--arkiv-blue); word-break: break-all;\">Tx: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var56 string
-		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(deposit.L2Timestamp))
+		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.TxHashL2))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 611, Col: 112}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 607, Col: 119}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "</p><p style=\"font-size: 14px; color: var(--arkiv-blue); word-break: break-all;\">Tx: ")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var57 string
-		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(shortenAddress(deposit.TxHashL2))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 612, Col: 119}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</p></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "</p></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1029,50 +1013,50 @@ func TimeSeriesChart(pathPrefix string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var58 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var58 == nil {
-			templ_7745c5c3_Var58 = templ.NopComponent
+		templ_7745c5c3_Var57 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var57 == nil {
+			templ_7745c5c3_Var57 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<div hx-swap=\"morphdom\"><h2 class=\"section-title\">Deposit Confirmation Times</h2><div class=\"golem-card\"><div style=\"position: relative; height: 400px;\"><canvas id=\"timeSeriesChart\"></canvas></div><script src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "<div hx-swap=\"morphdom\"><h2 class=\"section-title\">Deposit Confirmation Times</h2><div class=\"golem-card\"><div style=\"position: relative; height: 400px;\"><canvas id=\"timeSeriesChart\"></canvas></div><script src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var58 string
+		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/chart.min.js"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 621, Col: 65}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var58))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\"></script><script src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var59 string
-		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/chart.min.js"))
+		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/chartjs-adapter-date-fns.min.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 626, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 622, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var59))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\"></script><script src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\"></script><script>\n\t\t\t// Chart instance to enable updates\n\t\t\tlet timeSeriesChart;\n\n\t\t\t// Initialize the chart once\n\t\t\tfunction initializeChart() {\n\t\t\t\tconst ctx = document.getElementById('timeSeriesChart');\n\t\t\t\ttimeSeriesChart = new Chart(ctx, {\n\t\t\t\t\ttype: 'line',\n\t\t\t\t\tdata: {\n\t\t\t\t\t\tdatasets: [{\n\t\t\t\t\t\t\tlabel: 'Confirmation Time (seconds)',\n\t\t\t\t\t\t\tdata: [],\n\t\t\t\t\t\t\tbackgroundColor: 'rgba(24, 30, 169, 0.1)',\n\t\t\t\t\t\t\tborderColor: '#181EA9',\n\t\t\t\t\t\t\tborderWidth: 3,\n\t\t\t\t\t\t\tpointStyle: 'circle',\n\t\t\t\t\t\t\tpointRadius: 4,\n\t\t\t\t\t\t\tpointBackgroundColor: '#181EA9',\n\t\t\t\t\t\t\tpointBorderColor: '#ffffff',\n\t\t\t\t\t\t\tpointBorderWidth: 2,\n\t\t\t\t\t\t\tpointHoverRadius: 6,\n\t\t\t\t\t\t\tpointHoverBackgroundColor: '#FE7445',\n\t\t\t\t\t\t\tpointHoverBorderColor: '#ffffff',\n\t\t\t\t\t\t\ttension: 0.05,\n\t\t\t\t\t\t\tfill: true\n\t\t\t\t\t\t}]\n\t\t\t\t\t},\n\t\t\t\t\toptions: {\n\t\t\t\t\t\tresponsive: true,\n\t\t\t\t\t\tmaintainAspectRatio: false,\n\t\t\t\t\t\tplugins: {\n\t\t\t\t\t\t\ttitle: {\n\t\t\t\t\t\t\t\tdisplay: false\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tlegend: {\n\t\t\t\t\t\t\t\tdisplay: false\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\ttooltip: {\n\t\t\t\t\t\t\t\tbackgroundColor: 'rgba(31, 31, 31, 0.95)',\n\t\t\t\t\t\t\t\ttitleColor: '#ffffff',\n\t\t\t\t\t\t\t\tbodyColor: '#ffffff',\n\t\t\t\t\t\t\t\tborderColor: '#FE7445',\n\t\t\t\t\t\t\t\tborderWidth: 2,\n\t\t\t\t\t\t\t\tcallbacks: {\n\t\t\t\t\t\t\t\t\ttitle: function(context) {\n\t\t\t\t\t\t\t\t\t\t// Simply format the x value directly\n\t\t\t\t\t\t\t\t\t\tif (context[0].parsed.x) {\n\t\t\t\t\t\t\t\t\t\t\tconst date = new Date(context[0].parsed.x);\n\t\t\t\t\t\t\t\t\t\t\treturn date.toLocaleString();\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\treturn '';\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tscales: {\n\t\t\t\t\t\t\ty: {\n\t\t\t\t\t\t\t\ttitle: {\n\t\t\t\t\t\t\t\t\tdisplay: true,\n\t\t\t\t\t\t\t\t\ttext: 'Seconds',\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tbeginAtZero: true,\n\t\t\t\t\t\t\t\tticks: {\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tgrid: {\n\t\t\t\t\t\t\t\t\tcolor: 'rgba(172, 172, 172, 0.2)'\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tx: {\n\t\t\t\t\t\t\t\ttype: 'time',\n\t\t\t\t\t\t\t\ttime: {\n\t\t\t\t\t\t\t\t\tunit: 'hour',\n\t\t\t\t\t\t\t\t\tdisplayFormats: {\n\t\t\t\t\t\t\t\t\t\thour: 'MMM d, HH:mm'\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t\ttooltipFormat: 'MMM d, yyyy HH:mm'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\ttitle: {\n\t\t\t\t\t\t\t\t\tdisplay: true,\n\t\t\t\t\t\t\t\t\ttext: 'Date',\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tticks: {\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tgrid: {\n\t\t\t\t\t\t\t\t\tcolor: 'rgba(172, 172, 172, 0.2)'\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\t// Function to fetch data and update the chart\n\t\t\tfunction updateChart() {\n\t\t\t\tfetch('")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var60 string
-		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.JoinStringErrs(prefixURL(pathPrefix, "/static/js/chartjs-adapter-date-fns.min.js"))
+		templ_7745c5c3_Var60, templ_7745c5c3_Err := templruntime.ScriptContentInsideStringLiteral(prefixURL(pathPrefix, "/api/chart-data"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 627, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 722, Col: 54}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var60))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\"></script><script>\n\t\t\t// Chart instance to enable updates\n\t\t\tlet timeSeriesChart;\n\n\t\t\t// Initialize the chart once\n\t\t\tfunction initializeChart() {\n\t\t\t\tconst ctx = document.getElementById('timeSeriesChart');\n\t\t\t\ttimeSeriesChart = new Chart(ctx, {\n\t\t\t\t\ttype: 'line',\n\t\t\t\t\tdata: {\n\t\t\t\t\t\tdatasets: [{\n\t\t\t\t\t\t\tlabel: 'Confirmation Time (seconds)',\n\t\t\t\t\t\t\tdata: [],\n\t\t\t\t\t\t\tbackgroundColor: 'rgba(24, 30, 169, 0.1)',\n\t\t\t\t\t\t\tborderColor: '#181EA9',\n\t\t\t\t\t\t\tborderWidth: 3,\n\t\t\t\t\t\t\tpointStyle: 'circle',\n\t\t\t\t\t\t\tpointRadius: 4,\n\t\t\t\t\t\t\tpointBackgroundColor: '#181EA9',\n\t\t\t\t\t\t\tpointBorderColor: '#ffffff',\n\t\t\t\t\t\t\tpointBorderWidth: 2,\n\t\t\t\t\t\t\tpointHoverRadius: 6,\n\t\t\t\t\t\t\tpointHoverBackgroundColor: '#FE7445',\n\t\t\t\t\t\t\tpointHoverBorderColor: '#ffffff',\n\t\t\t\t\t\t\ttension: 0.05,\n\t\t\t\t\t\t\tfill: true\n\t\t\t\t\t\t}]\n\t\t\t\t\t},\n\t\t\t\t\toptions: {\n\t\t\t\t\t\tresponsive: true,\n\t\t\t\t\t\tmaintainAspectRatio: false,\n\t\t\t\t\t\tplugins: {\n\t\t\t\t\t\t\ttitle: {\n\t\t\t\t\t\t\t\tdisplay: false\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tlegend: {\n\t\t\t\t\t\t\t\tdisplay: false\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\ttooltip: {\n\t\t\t\t\t\t\t\tbackgroundColor: 'rgba(31, 31, 31, 0.95)',\n\t\t\t\t\t\t\t\ttitleColor: '#ffffff',\n\t\t\t\t\t\t\t\tbodyColor: '#ffffff',\n\t\t\t\t\t\t\t\tborderColor: '#FE7445',\n\t\t\t\t\t\t\t\tborderWidth: 2,\n\t\t\t\t\t\t\t\tcallbacks: {\n\t\t\t\t\t\t\t\t\ttitle: function(context) {\n\t\t\t\t\t\t\t\t\t\t// Simply format the x value directly\n\t\t\t\t\t\t\t\t\t\tif (context[0].parsed.x) {\n\t\t\t\t\t\t\t\t\t\t\tconst date = new Date(context[0].parsed.x);\n\t\t\t\t\t\t\t\t\t\t\treturn date.toLocaleString();\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\treturn '';\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\tscales: {\n\t\t\t\t\t\t\ty: {\n\t\t\t\t\t\t\t\ttitle: {\n\t\t\t\t\t\t\t\t\tdisplay: true,\n\t\t\t\t\t\t\t\t\ttext: 'Seconds',\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tbeginAtZero: true,\n\t\t\t\t\t\t\t\tticks: {\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tgrid: {\n\t\t\t\t\t\t\t\t\tcolor: 'rgba(172, 172, 172, 0.2)'\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tx: {\n\t\t\t\t\t\t\t\ttype: 'time',\n\t\t\t\t\t\t\t\ttime: {\n\t\t\t\t\t\t\t\t\tunit: 'hour',\n\t\t\t\t\t\t\t\t\tdisplayFormats: {\n\t\t\t\t\t\t\t\t\t\thour: 'MMM d, HH:mm'\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t\ttooltipFormat: 'MMM d, yyyy HH:mm'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\ttitle: {\n\t\t\t\t\t\t\t\t\tdisplay: true,\n\t\t\t\t\t\t\t\t\ttext: 'Date',\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tticks: {\n\t\t\t\t\t\t\t\t\tcolor: '#1F1F1F'\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tgrid: {\n\t\t\t\t\t\t\t\t\tcolor: 'rgba(172, 172, 172, 0.2)'\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\t// Function to fetch data and update the chart\n\t\t\tfunction updateChart() {\n\t\t\t\tfetch('")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var61, templ_7745c5c3_Err := templruntime.ScriptContentInsideStringLiteral(prefixURL(pathPrefix, "/api/chart-data"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/webui/templates.templ`, Line: 727, Col: 54}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "')\n\t\t\t\t\t.then(response => response.json())\n\t\t\t\t\t.then(data => {\n\t\t\t\t\t\t// Create dataset with proper timestamp objects\n\t\t\t\t\t\tconst dataset = data.map(point => {\n\t\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\t\tx: new Date(point.timestamp),\n\t\t\t\t\t\t\t\ty: point.timeDiffSeconds\n\t\t\t\t\t\t\t};\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\t// Update chart data without destroying the chart\n\t\t\t\t\t\tif (timeSeriesChart) {\n\t\t\t\t\t\t\ttimeSeriesChart.data.datasets[0].data = dataset;\n\t\t\t\t\t\t\ttimeSeriesChart.update();\n\t\t\t\t\t\t}\n\t\t\t\t\t})\n\t\t\t\t\t.catch(error => console.error('Error fetching chart data:', error));\n\t\t\t}\n\n\t\t\t// Initialize chart once\n\t\t\tinitializeChart();\n\t\t\t\n\t\t\t// Initial data load\n\t\t\tupdateChart();\n\n\t\t\t// Refresh data every 10 seconds\n\t\t\tsetInterval(updateChart, 10000);\n\t\t</script></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "')\n\t\t\t\t\t.then(response => response.json())\n\t\t\t\t\t.then(data => {\n\t\t\t\t\t\t// Create dataset with proper timestamp objects\n\t\t\t\t\t\tconst dataset = data.map(point => {\n\t\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\t\tx: new Date(point.timestamp),\n\t\t\t\t\t\t\t\ty: point.timeDiffSeconds\n\t\t\t\t\t\t\t};\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\t// Update chart data without destroying the chart\n\t\t\t\t\t\tif (timeSeriesChart) {\n\t\t\t\t\t\t\ttimeSeriesChart.data.datasets[0].data = dataset;\n\t\t\t\t\t\t\ttimeSeriesChart.update();\n\t\t\t\t\t\t}\n\t\t\t\t\t})\n\t\t\t\t\t.catch(error => console.error('Error fetching chart data:', error));\n\t\t\t}\n\n\t\t\t// Initialize chart once\n\t\t\tinitializeChart();\n\t\t\t\n\t\t\t// Initial data load\n\t\t\tupdateChart();\n\n\t\t\t// Refresh data every 10 seconds\n\t\t\tsetInterval(updateChart, 10000);\n\t\t</script></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
