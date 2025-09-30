@@ -1,0 +1,13 @@
+dev:
+  bridgette:
+    command: ["/bin/bash"]
+    image: okteto/golang:1.24
+    sync:
+      - .:/usr/src/app
+    resources:
+      limits:
+        cpu: 4000m
+        memory: 8Gi
+      requests:
+        cpu: 2000m
+        memory: 4Gi
