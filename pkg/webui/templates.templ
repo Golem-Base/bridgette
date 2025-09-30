@@ -21,27 +21,6 @@ func prefixURL(pathPrefix, url string) string {
 	return prefix + url
 }
 
-css wavesLeftBg(pathPrefix string) {
-	background-image: { templ.SafeCSSProperty("url('" + prefixURL(pathPrefix, "/static/img/waves_left.svg") + "')") };
-}
-
-css wavesRightBg(pathPrefix string) {
-	background-image: { templ.SafeCSSProperty("url('" + prefixURL(pathPrefix, "/static/img/waves_right.svg") + "')") };
-}
-
-css linesOverlayBg(pathPrefix string) {
-	background-image: { templ.SafeCSSProperty("url('" + prefixURL(pathPrefix, "/static/img/lines.svg") + "')") };
-}
-
-css networkBg(pathPrefix string) {
-	background: { templ.SafeCSSProperty("url('" + prefixURL(pathPrefix, "/static/img/bg.webp") + "')") };
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	position: relative;
-	min-height: 100vh;
-}
-
 templ Layout(title string, pathPrefix string) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -54,226 +33,334 @@ templ Layout(title string, pathPrefix string) {
 			<script src={ prefixURL(pathPrefix, "/static/js/morphdom-swap.js") }></script>
 			<script src={ prefixURL(pathPrefix, "/static/js/tailwind.min.js") }></script>
 			<style>
+				* {
+					margin: 0;
+					padding: 0;
+					box-sizing: border-box;
+				}
+
 				:root {
-					--golem-blue-dark: #1e3a8a;
-					--golem-blue: #3b82f6;
-					--golem-blue-light: #60a5fa;
-					--golem-accent: #1e40af;
+					--arkiv-blue: #181EA9;
+					--arkiv-orange: #FE7445;
+					--black: #1F1F1F;
+					--white: #FFFFFF;
+					--gray-light: #F1F1F1;
+					--gray-neutral: #ACACAC;
 				}
-				
+
 				body {
-					font-family: ui-sans-serif, system-ui, sans-serif;
-					color: white;
-					min-height: 100vh;
-					position: relative;
+					font-family: 'Courier New', monospace;
+					color: var(--black);
+					line-height: 1.6;
+					background: var(--white);
+				}
+
+				h1, h2, h3 {
+					font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+					font-weight: 900 !important;
+					text-transform: uppercase !important;
+					letter-spacing: -0.02em !important;
+				}
+
+				header h1 {
+					font-size: 80px !important;
+					line-height: 80px !important;
+					margin-bottom: 1.5rem !important;
+					color: var(--black) !important;
+					letter-spacing: -0.02em !important;
 				}
 				
 
+				.container {
+					max-width: 1280px;
+					margin: 0 auto;
+					padding: 0 60px;
+				}
 
-				
-				.waves-left {
-					position: fixed;
-					top: 0;
-					left: 0;
-					z-index: 0;
-					max-height: 100%;
-					background-repeat: no-repeat;
-					background-size: auto 100vh;
-					background-position: left top;
-					width: 40vw;
-					max-width: 50vw;
-					height: 100vh;
-					pointer-events: none;
-					animation: float-left 20s ease-in-out infinite;
-					overflow: hidden;
+				@media (max-width: 768px) {
+					.container {
+						padding: 0 1rem;
+					}
 				}
-				
-				.waves-right {
-					position: fixed;
-					top: 0;
-					right: 0;
-					z-index: 0;
-					max-height: 100%;
-					background-repeat: no-repeat;
-					background-size: auto 100vh;
-					background-position: right top;
-					width: 40vw;
-					max-width: 50vw;
-					height: 100vh;
-					pointer-events: none;
-					animation: float-right 20s ease-in-out infinite;
-					overflow: hidden;
+
+
+				/* Header */
+				header {
+					padding: 64px 0;
+					text-align: center;
+					background: var(--white);
 				}
-				
-				.lines-overlay {
-					position: fixed;
-					top: 0;
-					right: 0;
-					z-index: 0;
-					max-height: 100%;
-					background-repeat: no-repeat;
-					background-size: auto 100vh;
-					background-position: right top;
-					width: 40vw;
-					max-width: 50vw;
-					height: 100vh;
-					pointer-events: none;
-					opacity: 0.7;
+
+				.logo {
+					font-size: 14px !important;
+					font-weight: 600 !important;
+					letter-spacing: 0.1em !important;
+					color: var(--arkiv-blue) !important;
+					margin-bottom: 2rem !important;
 				}
-				
-				@keyframes float-left {
-					0%, 100% { transform: translateY(0px) translateX(0px); }
-					25% { transform: translateY(-10px) translateX(5px); }
-					50% { transform: translateY(0px) translateX(-5px); }
-					75% { transform: translateY(5px) translateX(10px); }
+
+				.subtitle {
+					font-size: 16px !important;
+					color: var(--gray-neutral) !important;
+					font-weight: 400 !important;
+					margin-bottom: 2rem !important;
 				}
-				
-				@keyframes float-right {
-					0%, 100% { transform: translateY(0px) translateX(0px); }
-					25% { transform: translateY(10px) translateX(-5px); }
-					50% { transform: translateY(0px) translateX(5px); }
-					75% { transform: translateY(-5px) translateX(-10px); }
+
+				.status-badge {
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					background: var(--white);
+					border: 2px solid var(--arkiv-orange);
+					color: var(--arkiv-orange);
+					padding: 8px 20px;
+					border-radius: 24px;
+					font-size: 12px;
+					font-weight: 700;
+					text-transform: uppercase;
+					letter-spacing: 0.05em;
 				}
-				
-				header,
-				main,
-				footer {
-					position: relative;
-					z-index: 10;
-				}
-				
-				.golem-header {
-					background: rgba(0, 0, 0, 0.1);
-					backdrop-filter: blur(10px);
-					border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-					color: white;
-				}
-				
-				.golem-button {
-					background: rgba(255, 255, 255, 0.2);
-					color: white;
-					border-radius: 0.5rem;
-					padding: 0.75rem 1.5rem;
-					font-weight: 600;
-					transition: all 0.2s;
-					border: 1px solid rgba(255, 255, 255, 0.3);
-					backdrop-filter: blur(10px);
-				}
-				
-				.golem-button:hover {
-					background: rgba(255, 255, 255, 0.3);
-					border-color: rgba(255, 255, 255, 0.5);
-				}
-				
-				.golem-card {
-					background: rgba(255, 255, 255, 0.1);
-					backdrop-filter: blur(15px);
-					border: 1px solid rgba(255, 255, 255, 0.2);
-					border-radius: 1rem;
-					box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-					padding: 2rem;
-					color: white;
-				}
-				
-				.timeline-item {
-					border-left: 2px solid rgba(255, 255, 255, 0.3);
-					padding-left: 1.5rem;
-					padding-bottom: 2rem;
-					position: relative;
-				}
-				
-				.timeline-item::before {
-					content: '';
-					position: absolute;
-					left: -8px;
-					top: 0;
-					height: 14px;
-					width: 14px;
-					background: rgba(255, 255, 255, 0.8);
+
+				.status-dot {
+					width: 8px;
+					height: 8px;
+					background: var(--arkiv-orange);
 					border-radius: 50%;
-					box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+					animation: pulse 2s infinite;
 				}
-				
-				.timeline-container {
-					margin-left: 1rem;
+
+				@keyframes pulse {
+					0%, 100% { opacity: 1; }
+					50% { opacity: 0.4; }
 				}
-				
-				.status-waiting {
-					background: rgba(245, 158, 11, 0.2);
-					border: 1px solid rgba(245, 158, 11, 0.4);
-					color: #fbbf24;
+
+				/* Section */
+				section {
+					padding: 64px 0;
 				}
-				
-				.status-completed {
-					background: rgba(34, 197, 94, 0.2);
-					border: 1px solid rgba(34, 197, 94, 0.4);
-					color: #4ade80;
+
+				section:nth-child(even) {
+					background: var(--gray-light);
 				}
-				
+
+				.section-title {
+					font-size: clamp(32px, 5vw, 48px);
+					margin-bottom: 48px;
+					color: var(--black);
+				}
+
+				.section-title::before {
+					content: "[ ";
+					color: var(--arkiv-orange);
+				}
+
+				.section-title::after {
+					content: " ]";
+					color: var(--arkiv-orange);
+				}
+
+				/* Cards */
+				.card-grid {
+					display: grid;
+					grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+					gap: 32px;
+				}
+
+				.card {
+					background: var(--white);
+					padding: 32px;
+					border-radius: 24px;
+					box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+					transition: transform 0.3s, box-shadow 0.3s;
+				}
+
+				.card:hover {
+					transform: translateY(-4px);
+					box-shadow: 0 8px 32px rgba(24, 30, 169, 0.12);
+				}
+
+				.card-label {
+					font-size: 12px;
+					color: var(--gray-neutral);
+					text-transform: uppercase;
+					letter-spacing: 0.05em;
+					margin-bottom: 8px;
+					font-weight: 600;
+				}
+
+				.card-value {
+					font-size: 16px;
+					color: var(--black);
+					font-weight: 600;
+					word-break: break-all;
+				}
+
 				.metric-card {
-					background: rgba(255, 255, 255, 0.15);
-					backdrop-filter: blur(10px);
-					border: 1px solid rgba(255, 255, 255, 0.25);
-					border-radius: 0.75rem;
-					padding: 1.5rem;
-					color: white;
+					background: var(--white);
+					padding: 32px;
+					border-radius: 24px;
+					box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+					transition: transform 0.3s, box-shadow 0.3s;
 				}
-				
+
+				.metric-card:hover {
+					transform: translateY(-2px);
+					box-shadow: 0 8px 32px rgba(24, 30, 169, 0.12);
+				}
+
+				.metric-label {
+					font-size: 12px;
+					color: var(--gray-neutral);
+					text-transform: uppercase;
+					letter-spacing: 0.05em;
+					margin-bottom: 12px;
+					font-weight: 600;
+				}
+
 				.metric-value {
 					font-size: 2rem;
-					font-weight: bold;
+					font-weight: 900;
+					color: var(--black);
+				}
+
+				.golem-card {
+					background: var(--white);
+					padding: 32px;
+					border-radius: 24px;
+					box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+					margin-bottom: 24px;
+				}
+
+				.golem-button {
+					padding: 12px 24px;
+					background: var(--arkiv-blue);
+					color: var(--white);
+					border: none;
+					border-radius: 24px;
+					cursor: pointer;
+					font-size: 12px;
+					font-weight: 700;
+					text-transform: uppercase;
+					transition: all 0.3s;
+					font-family: 'Courier New', monospace;
+				}
+
+				.golem-button:hover {
+					background: var(--arkiv-orange);
+					transform: scale(1.05);
+				}
+
+				.timeline-container {
+					margin-left: 0;
+				}
+
+				.timeline-item {
+					margin-bottom: 24px;
+				}
+
+				/* Footer */
+				footer {
+					background: var(--black);
 					color: white;
+					padding: 64px 0;
+					text-align: center;
 				}
-				
-				.metric-label {
-					color: rgba(255, 255, 255, 0.8);
-					font-size: 1.125rem;
+
+				.footer-logo {
+					font-size: 14px;
 					font-weight: 600;
+					letter-spacing: 0.1em;
+					margin-bottom: 16px;
+					color: var(--arkiv-orange);
 				}
-				
-				.text-amber-600 {
-					color: #fbbf24 !important;
+
+				footer p {
+					font-size: 14px;
+					opacity: 0.7;
 				}
-				
-				.text-gray-500 {
-					color: rgba(255, 255, 255, 0.6) !important;
+
+				footer a {
+					color: var(--arkiv-orange);
+					text-decoration: none;
+					font-weight: 600;
+					transition: opacity 0.3s;
 				}
-				
-				.text-gray-600 {
-					color: rgba(255, 255, 255, 0.7) !important;
+
+				footer a:hover {
+					opacity: 0.8;
 				}
-				
-				.text-blue-600 {
-					color: #60a5fa !important;
+
+				/* Responsive */
+				@media (max-width: 768px) {
+					h1 {
+						font-size: 36px;
+					}
+
+					.section-title {
+						font-size: 28px;
+					}
+
+					section {
+						padding: 48px 0;
+					}
 				}
-				
-				.border-amber-500 {
-					border-color: #fbbf24 !important;
+
+				/* Status colors */
+				.text-amber-600, .text-amber-400, .text-amber-300 {
+					color: var(--arkiv-orange) !important;
+				}
+
+				.border-amber-500, .border-amber-400 {
+					border-color: var(--arkiv-orange) !important;
+				}
+
+				.bg-amber-500\/20 {
+					background: rgba(254, 116, 69, 0.1) !important;
+				}
+
+				.text-green-300, .text-green-400 {
+					color: #10b981 !important;
+				}
+
+				.bg-green-500\/20 {
+					background: rgba(16, 185, 129, 0.1) !important;
+				}
+
+				.border-green-400 {
+					border-color: #10b981 !important;
+				}
+
+				.text-blue-400 {
+					color: var(--arkiv-blue) !important;
+				}
+
+				.text-gray-500, .text-gray-600 {
+					color: var(--gray-neutral) !important;
+				}
+
+				.border-l-4 {
+					border-left: 4px solid var(--arkiv-orange) !important;
 				}
 			</style>
 		</head>
-		<body class={ "text-white min-h-screen", networkBg(pathPrefix) } hx-ext="morphdom-swap">
-			<div class={ "waves-left", wavesLeftBg(pathPrefix) }></div>
-			<div class={ "waves-right", wavesRightBg(pathPrefix) }></div>
-			<div class={ "lines-overlay", linesOverlayBg(pathPrefix) }></div>
-			
-			<header class="golem-header py-6">
-				<div class="container mx-auto px-4">
-					<div class="flex items-center justify-between">
-						<div class="flex items-center">
-							<h1 class="text-3xl font-bold text-white">Golem Bridge Monitor</h1>
-						</div>
-					</div>
+		<body hx-ext="morphdom-swap">
+			<header>
+				<div class="container">
+					<div class="logo">[ ARKIV ]</div>
+					<h1>ARKIV BRIDGE</h1>
+					<p class="subtitle">Cross-chain Transaction Tracking</p>
 				</div>
 			</header>
-			
-			<main class="container mx-auto px-4 py-8">
+
+			<main>
 				{ children... }
 			</main>
-			
-			<footer class="py-6 mt-12 border-t border-white/20 bg-black/10 backdrop-blur-sm">
-				<div class="container mx-auto px-4">
-					<p class="text-center text-white/80">© { time.Now().Year() } Golem Base. All rights reserved.</p>
+
+			<footer>
+				<div class="container">
+					<div class="footer-logo">[ ARKIV ]</div>
+					<p>Powered by <a href="https://www.golem.network/" target="_blank">Golem Network</a></p>
+					<p style="margin-top: 8px;">© { time.Now().Year() } Arkiv. All rights reserved.</p>
 				</div>
 			</footer>
 		</body>
@@ -283,63 +370,80 @@ templ Layout(title string, pathPrefix string) {
 // Dashboard is the main page template
 templ Dashboard(pathPrefix string) {
 	@Layout("Dashboard", pathPrefix) {
-		<div class="space-y-8">
-			<div id="dashboard-metrics" hx-get={ prefixURL(pathPrefix, "/dashboard/metrics") } hx-trigger="load"></div>
-			<div id="bridge-performance" hx-get={ prefixURL(pathPrefix, "/dashboard/performance") } hx-trigger="load"></div>
-			<div>
+		<section>
+			<div class="container">
+				<div id="dashboard-metrics" hx-get={ prefixURL(pathPrefix, "/dashboard/metrics") } hx-trigger="load"></div>
+			</div>
+		</section>
+		<section>
+			<div class="container">
+				<div id="bridge-performance" hx-get={ prefixURL(pathPrefix, "/dashboard/performance") } hx-trigger="load"></div>
+			</div>
+		</section>
+		<section>
+			<div class="container">
 				@TimeSeriesChart(pathPrefix)
 			</div>
-			<div id="unmatched-deposits-section" hx-get={ prefixURL(pathPrefix, "/dashboard/unmatched") } hx-trigger="load"></div>
-			<div id="deposits-timeline-section" hx-get={ prefixURL(pathPrefix, "/dashboard/timeline") } hx-trigger="load"></div>
-		</div>
+		</section>
+		<section>
+			<div class="container">
+				<div id="unmatched-deposits-section" hx-get={ prefixURL(pathPrefix, "/dashboard/unmatched") } hx-trigger="load"></div>
+			</div>
+		</section>
+		<section>
+			<div class="container">
+				<div id="deposits-timeline-section" hx-get={ prefixURL(pathPrefix, "/dashboard/timeline") } hx-trigger="load"></div>
+			</div>
+		</section>
 	}
 }
 
 // DashboardMetrics contains the metrics cards
 templ DashboardMetrics(stats map[string]interface{}, pathPrefix string) {
 	<div hx-get={ prefixURL(pathPrefix, "/dashboard/metrics") } hx-trigger="every 2s" hx-swap="morphdom" hx-swap="outerHTML">
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+		<h2 class="section-title">Network Metrics</h2>
+		<div class="card-grid" style="margin-bottom: 32px;">
 			<div class="metric-card">
-				<h3 class="metric-label mb-3">Total Matched Deposits</h3>
-				<p class="metric-value">{ fmt.Sprintf("%d", stats["total_matched"].(int)) }</p>
+				<div class="metric-label">Total Matched Deposits</div>
+				<div class="metric-value">{ fmt.Sprintf("%d", stats["total_matched"].(int)) }</div>
 			</div>
 			<div class="metric-card">
-				<h3 class="metric-label mb-3">Average Confirmation Time</h3>
-				<p class="metric-value">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</p>
+				<div class="metric-label">Average Confirmation Time</div>
+				<div class="metric-value">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</div>
 			</div>
 			<div class="metric-card">
-				<h3 class="metric-label mb-3">Total Bridged ETH</h3>
-				<p class="metric-value">{ fmt.Sprintf("%.4f ETH", stats["total_bridged_eth"].(float64)) }</p>
+				<div class="metric-label">Total Bridged ETH</div>
+				<div class="metric-value">{ fmt.Sprintf("%.4f ETH", stats["total_bridged_eth"].(float64)) }</div>
 			</div>
 		</div>
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-			<div class="metric-card border-2 border-amber-500/50">
-				<h3 class="metric-label mb-3 text-amber-400">Unmatched Deposits</h3>
-				<p class="metric-value text-amber-300">{ fmt.Sprintf("%d", stats["pending_deposits"].(int)) }</p>
+		<div class="card-grid">
+			<div class="metric-card" style="border: 2px solid var(--arkiv-orange);">
+				<div class="metric-label" style="color: var(--arkiv-orange);">Unmatched Deposits</div>
+				<div class="metric-value" style="color: var(--arkiv-orange);">{ fmt.Sprintf("%d", stats["pending_deposits"].(int)) }</div>
 			</div>
 			<div class="metric-card">
-				<h2 class="text-xl font-bold mb-4 text-white">Latest L1 Block</h2>
-				<div class="grid grid-cols-2 gap-4">
+				<div class="metric-label" style="margin-bottom: 16px;">Latest L1 Block</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
 					<div>
-						<h4 class="text-sm font-medium text-white/60 mb-1">Block Number</h4>
-						<p class="text-lg font-semibold text-white">{ fmt.Sprintf("%d", stats["latest_l1_block"].(int)) }</p>
+						<div style="font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;">Block Number</div>
+						<div style="font-size: 1.125rem; font-weight: 700; color: var(--black);">{ fmt.Sprintf("%d", stats["latest_l1_block"].(int)) }</div>
 					</div>
 					<div>
-						<h4 class="text-sm font-medium text-white/60 mb-1">Time Since</h4>
-						<p class="text-lg font-semibold text-white">{ fmt.Sprintf("%.1f sec", stats["l1_time_since"].(float64)) }</p>
+						<div style="font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;">Time Since</div>
+						<div style="font-size: 1.125rem; font-weight: 700; color: var(--black);">{ fmt.Sprintf("%.1f sec", stats["l1_time_since"].(float64)) }</div>
 					</div>
 				</div>
 			</div>
 			<div class="metric-card">
-				<h2 class="text-xl font-bold mb-4 text-white">Latest L2 Block</h2>
-				<div class="grid grid-cols-2 gap-4">
+				<div class="metric-label" style="margin-bottom: 16px;">Latest L2 Block</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
 					<div>
-						<h4 class="text-sm font-medium text-white/60 mb-1">Block Number</h4>
-						<p class="text-lg font-semibold text-white">{ fmt.Sprintf("%d", stats["latest_l2_block"].(int)) }</p>
+						<div style="font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;">Block Number</div>
+						<div style="font-size: 1.125rem; font-weight: 700; color: var(--black);">{ fmt.Sprintf("%d", stats["latest_l2_block"].(int)) }</div>
 					</div>
 					<div>
-						<h4 class="text-sm font-medium text-white/60 mb-1">Time Since</h4>
-						<p class="text-lg font-semibold text-white">{ fmt.Sprintf("%.1f sec", stats["l2_time_since"].(float64)) }</p>
+						<div style="font-size: 10px; color: var(--gray-neutral); text-transform: uppercase; margin-bottom: 4px;">Time Since</div>
+						<div style="font-size: 1.125rem; font-weight: 700; color: var(--black);">{ fmt.Sprintf("%.1f sec", stats["l2_time_since"].(float64)) }</div>
 					</div>
 				</div>
 			</div>
@@ -349,20 +453,20 @@ templ DashboardMetrics(stats map[string]interface{}, pathPrefix string) {
 
 // BridgePerformance contains the bridge performance stats
 templ BridgePerformance(stats map[string]interface{}, pathPrefix string) {
-	<div class="golem-card" hx-get={ prefixURL(pathPrefix, "/dashboard/performance") } hx-trigger="every 3s" hx-swap="morphdom" hx-swap="outerHTML">
-		<h2 class="text-xl font-bold mb-4">Bridge Performance</h2>
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-			<div>
-				<h4 class="text-sm font-medium text-gray-500">Minimum Time</h4>
-				<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["min_time_diff"].(float64)) }</p>
+	<div hx-get={ prefixURL(pathPrefix, "/dashboard/performance") } hx-trigger="every 3s" hx-swap="morphdom" hx-swap="outerHTML">
+		<h2 class="section-title">Bridge Performance</h2>
+		<div class="card-grid">
+			<div class="metric-card">
+				<div class="metric-label">Minimum Time</div>
+				<div class="metric-value">{ fmt.Sprintf("%.1f sec", stats["min_time_diff"].(float64)) }</div>
 			</div>
-			<div>
-				<h4 class="text-sm font-medium text-gray-500">Average Time</h4>
-				<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</p>
+			<div class="metric-card">
+				<div class="metric-label">Average Time</div>
+				<div class="metric-value">{ fmt.Sprintf("%.1f sec", stats["avg_time_diff"].(float64)) }</div>
 			</div>
-			<div>
-				<h4 class="text-sm font-medium text-gray-500">Maximum Time</h4>
-				<p class="text-lg font-semibold">{ fmt.Sprintf("%.1f sec", stats["max_time_diff"].(float64)) }</p>
+			<div class="metric-card">
+				<div class="metric-label">Maximum Time</div>
+				<div class="metric-value">{ fmt.Sprintf("%.1f sec", stats["max_time_diff"].(float64)) }</div>
 			</div>
 		</div>
 	</div>
@@ -370,14 +474,12 @@ templ BridgePerformance(stats map[string]interface{}, pathPrefix string) {
 
 // UnmatchedDepositsSection contains the unmatched deposits section
 templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int, pathPrefix string) {
-	<div class="golem-card" hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page)) } hx-trigger="every 2s" hx-swap="morphdom" hx-swap="outerHTML">
-		<div class="mb-6">
-			<h2 class="text-xl font-bold text-amber-600">Unmatched Deposits</h2>
-			<p class="text-sm text-gray-600">Deposits waiting for L2 confirmation</p>
-		</div>
+	<div hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page)) } hx-trigger="every 2s" hx-swap="morphdom" hx-swap="outerHTML">
+		<h2 class="section-title">Unmatched Deposits</h2>
+		<p style="font-size: 14px; color: var(--gray-neutral); margin-bottom: 32px;">Deposits waiting for L2 confirmation</p>
 		<div class="timeline-container">
 			if len(deposits) == 0 {
-				<p class="text-center py-6 text-gray-500">No unmatched deposits found</p>
+				<p style="text-align: center; padding: 3rem 0; color: var(--gray-neutral);">No unmatched deposits found</p>
 			} else {
 				for _, deposit := range deposits {
 					@UnmatchedDepositItem(deposit)
@@ -385,16 +487,16 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 			}
 		</div>
 		if totalPages > 1 {
-			<div class="flex justify-between items-center mt-6">
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 32px;">
 				<div>
-					<span class="text-sm text-gray-600">Page { fmt.Sprintf("%d of %d", page, totalPages) }</span>
+					<span style="font-size: 14px; color: var(--gray-neutral);">Page { fmt.Sprintf("%d of %d", page, totalPages) }</span>
 				</div>
-				<div class="flex space-x-2">
+				<div style="display: flex; gap: 12px;">
 					if page > 1 {
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page-1)) }
-							hx-target="closest .golem-card"
+							hx-target="closest div"
 							hx-swap="morphdom"
 						>
 							Previous
@@ -404,7 +506,7 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/unmatched?page=%d", page+1)) }
-							hx-target="closest .golem-card"
+							hx-target="closest div"
 							hx-swap="morphdom"
 						>
 							Next
@@ -418,13 +520,11 @@ templ UnmatchedDepositsSection(deposits []UnmatchedDeposit, page, totalPages int
 
 // DepositsTimelineSection contains the deposits timeline section
 templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int, pathPrefix string) {
-	<div class="golem-card" hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page)) } hx-trigger="every 5s" hx-swap="morphdom" hx-swap="outerHTML">
-		<div class="mb-6">
-			<h2 class="text-xl font-bold">Deposit Timeline</h2>
-		</div>
+	<div hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page)) } hx-trigger="every 5s" hx-swap="morphdom" hx-swap="outerHTML">
+		<h2 class="section-title">Deposit Timeline</h2>
 		<div class="timeline-container">
 			if len(deposits) == 0 {
-				<p class="text-center py-6 text-gray-500">No deposits found</p>
+				<p style="text-align: center; padding: 3rem 0; color: var(--gray-neutral);">No deposits found</p>
 			} else {
 				for _, deposit := range deposits {
 					@DepositItem(deposit)
@@ -432,16 +532,16 @@ templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int, path
 			}
 		</div>
 		if totalPages > 1 {
-			<div class="flex justify-between items-center mt-6">
+			<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 32px;">
 				<div>
-					<span class="text-sm text-gray-600">Page { fmt.Sprintf("%d of %d", page, totalPages) }</span>
+					<span style="font-size: 14px; color: var(--gray-neutral);">Page { fmt.Sprintf("%d of %d", page, totalPages) }</span>
 				</div>
-				<div class="flex space-x-2">
+				<div style="display: flex; gap: 12px;">
 					if page > 1 {
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page-1)) }
-							hx-target="closest .golem-card"
+							hx-target="closest div"
 							hx-swap="morphdom"
 						>
 							Previous
@@ -451,7 +551,7 @@ templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int, path
 						<button
 							class="golem-button"
 							hx-get={ prefixURL(pathPrefix, fmt.Sprintf("/dashboard/timeline?page=%d", page+1)) }
-							hx-target="closest .golem-card"
+							hx-target="closest div"
 							hx-swap="morphdom"
 						>
 							Next
@@ -465,61 +565,51 @@ templ DepositsTimelineSection(deposits []DepositPair, page, totalPages int, path
 
 // UnmatchedDepositItem displays a single unmatched deposit
 templ UnmatchedDepositItem(deposit UnmatchedDeposit) {
-	<div class="timeline-item">
-		<div class="golem-card border-l-4 border-amber-400">
-			<div class="flex justify-between items-start mb-4">
-				<div>
-					<h3 class="text-lg font-semibold text-white">{ fmt.Sprintf("%.4f ETH", deposit.Amount) }</h3>
-					<p class="text-sm text-white/70">From: { shortenAddress(deposit.FromAddress) }</p>
-					<p class="text-sm text-white/70">To: { shortenAddress(deposit.ToAddress) }</p>
-				</div>
-				<div class="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-sm font-medium backdrop-blur-sm">
-					Waiting: { formatTimeDiff(deposit.TimeSinceSeconds) }
-				</div>
-			</div>
+	<div class="golem-card" style="border-left: 4px solid var(--arkiv-orange);">
+		<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
 			<div>
-				<h4 class="text-xs font-medium text-white/60 uppercase mb-2 tracking-wider">L1 Deposit</h4>
-				<p class="text-sm text-white/80 mb-1">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
-				<p class="text-sm text-white/80 mb-1">Time: { formatTime(deposit.L1Timestamp) }</p>
-				<span class="text-sm text-blue-400 overflow-hidden text-ellipsis whitespace-nowrap block">
-					Tx: { shortenAddress(deposit.TxHashL1) }
-				</span>
+				<h3 style="font-size: 1.25rem; font-weight: 700; color: var(--black); margin-bottom: 8px;">{ fmt.Sprintf("%.4f ETH", deposit.Amount) }</h3>
+				<p style="font-size: 14px; color: var(--gray-neutral); margin-bottom: 4px;">From: { shortenAddress(deposit.FromAddress) }</p>
+				<p style="font-size: 14px; color: var(--gray-neutral);">To: { shortenAddress(deposit.ToAddress) }</p>
 			</div>
+			<div style="padding: 8px 16px; border-radius: 24px; background: rgba(254, 116, 69, 0.1); border: 1px solid var(--arkiv-orange); color: var(--arkiv-orange); font-size: 12px; font-weight: 700; text-transform: uppercase;">
+				Waiting: { formatTimeDiff(deposit.TimeSinceSeconds) }
+			</div>
+		</div>
+		<div>
+			<h4 style="font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">L1 Deposit</h4>
+			<p style="font-size: 14px; color: var(--black); margin-bottom: 4px;">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
+			<p style="font-size: 14px; color: var(--black); margin-bottom: 4px;">Time: { formatTime(deposit.L1Timestamp) }</p>
+			<p style="font-size: 14px; color: var(--arkiv-blue); word-break: break-all;">Tx: { shortenAddress(deposit.TxHashL1) }</p>
 		</div>
 	</div>
 }
 
 // DepositItem displays a single deposit
 templ DepositItem(deposit DepositPair) {
-	<div class="timeline-item">
-		<div class="golem-card">
-			<div class="flex justify-between items-start mb-4">
-				<div>
-					<h3 class="text-lg font-semibold text-white">{ fmt.Sprintf("%.4f ETH", deposit.Amount) }</h3>
-					<p class="text-sm text-white/70">From: { shortenAddress(deposit.FromAddress) }</p>
-					<p class="text-sm text-white/70">To: { shortenAddress(deposit.ToAddress) }</p>
-				</div>
-				<div class="px-3 py-1 rounded-full bg-green-500/20 border border-green-400/40 text-green-300 text-sm font-medium backdrop-blur-sm">
-					{ formatTimeDiff(deposit.TimeDiffSeconds) }
-				</div>
+	<div class="golem-card">
+		<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+			<div>
+				<h3 style="font-size: 1.25rem; font-weight: 700; color: var(--black); margin-bottom: 8px;">{ fmt.Sprintf("%.4f ETH", deposit.Amount) }</h3>
+				<p style="font-size: 14px; color: var(--gray-neutral); margin-bottom: 4px;">From: { shortenAddress(deposit.FromAddress) }</p>
+				<p style="font-size: 14px; color: var(--gray-neutral);">To: { shortenAddress(deposit.ToAddress) }</p>
 			</div>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<div>
-					<h4 class="text-xs font-medium text-white/60 uppercase mb-2 tracking-wider">L1 Deposit</h4>
-					<p class="text-sm text-white/80 mb-1">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
-					<p class="text-sm text-white/80 mb-1">Time: { formatTime(deposit.L1Timestamp) }</p>
-					<span class="text-sm text-blue-400 overflow-hidden text-ellipsis whitespace-nowrap block">
-						Tx: { shortenAddress(deposit.TxHashL1) }
-					</span>
-				</div>
-				<div>
-					<h4 class="text-xs font-medium text-white/60 uppercase mb-2 tracking-wider">L2 Confirmation</h4>
-					<p class="text-sm text-white/80 mb-1">Block: { fmt.Sprintf("%d", deposit.L2BlockNumber) }</p>
-					<p class="text-sm text-white/80 mb-1">Time: { formatTime(deposit.L2Timestamp) }</p>
-					<span class="text-sm text-blue-400 overflow-hidden text-ellipsis whitespace-nowrap block">
-						Tx: { shortenAddress(deposit.TxHashL2) }
-					</span>
-				</div>
+			<div style="padding: 8px 16px; border-radius: 24px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+				{ formatTimeDiff(deposit.TimeDiffSeconds) }
+			</div>
+		</div>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+			<div>
+				<h4 style="font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">L1 Deposit</h4>
+				<p style="font-size: 14px; color: var(--black); margin-bottom: 4px;">Block: { fmt.Sprintf("%d", deposit.L1BlockNumber) }</p>
+				<p style="font-size: 14px; color: var(--black); margin-bottom: 4px;">Time: { formatTime(deposit.L1Timestamp) }</p>
+				<p style="font-size: 14px; color: var(--arkiv-blue); word-break: break-all;">Tx: { shortenAddress(deposit.TxHashL1) }</p>
+			</div>
+			<div>
+				<h4 style="font-size: 10px; font-weight: 600; color: var(--gray-neutral); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">L2 Confirmation</h4>
+				<p style="font-size: 14px; color: var(--black); margin-bottom: 4px;">Block: { fmt.Sprintf("%d", deposit.L2BlockNumber) }</p>
+				<p style="font-size: 14px; color: var(--black); margin-bottom: 4px;">Time: { formatTime(deposit.L2Timestamp) }</p>
+				<p style="font-size: 14px; color: var(--arkiv-blue); word-break: break-all;">Tx: { shortenAddress(deposit.TxHashL2) }</p>
 			</div>
 		</div>
 	</div>
@@ -527,9 +617,10 @@ templ DepositItem(deposit DepositPair) {
 
 // TimeSeriesChart displays a chart of deposit time differences over time
 templ TimeSeriesChart(pathPrefix string) {
-	<div class="golem-card" hx-swap="morphdom">
-		<h2 class="text-xl font-bold mb-4">Deposit Confirmation Times</h2>
-		<div class="relative h-96">
+	<div hx-swap="morphdom">
+		<h2 class="section-title">Deposit Confirmation Times</h2>
+		<div class="golem-card">
+		<div style="position: relative; height: 400px;">
 			<canvas id="timeSeriesChart"></canvas>
 		</div>
 		<script src={ prefixURL(pathPrefix, "/static/js/chart.min.js") }></script>
@@ -547,16 +638,16 @@ templ TimeSeriesChart(pathPrefix string) {
 						datasets: [{
 							label: 'Confirmation Time (seconds)',
 							data: [],
-							backgroundColor: 'rgba(255, 255, 255, 0.2)',
-							borderColor: '#ffffff',
+							backgroundColor: 'rgba(24, 30, 169, 0.1)',
+							borderColor: '#181EA9',
 							borderWidth: 3,
 							pointStyle: 'circle',
 							pointRadius: 4,
-							pointBackgroundColor: '#ffffff',
-							pointBorderColor: '#60a5fa',
+							pointBackgroundColor: '#181EA9',
+							pointBorderColor: '#ffffff',
 							pointBorderWidth: 2,
 							pointHoverRadius: 6,
-							pointHoverBackgroundColor: '#fbbf24',
+							pointHoverBackgroundColor: '#FE7445',
 							pointHoverBorderColor: '#ffffff',
 							tension: 0.05,
 							fill: true
@@ -573,11 +664,11 @@ templ TimeSeriesChart(pathPrefix string) {
 								display: false
 							},
 							tooltip: {
-								backgroundColor: 'rgba(0, 0, 0, 0.8)',
+								backgroundColor: 'rgba(31, 31, 31, 0.95)',
 								titleColor: '#ffffff',
 								bodyColor: '#ffffff',
-								borderColor: '#ffffff',
-								borderWidth: 1,
+								borderColor: '#FE7445',
+								borderWidth: 2,
 								callbacks: {
 									title: function(context) {
 										// Simply format the x value directly
@@ -595,14 +686,14 @@ templ TimeSeriesChart(pathPrefix string) {
 								title: {
 									display: true,
 									text: 'Seconds',
-									color: '#ffffff'
+									color: '#1F1F1F'
 								},
 								beginAtZero: true,
 								ticks: {
-									color: '#ffffff'
+									color: '#1F1F1F'
 								},
 								grid: {
-									color: 'rgba(255, 255, 255, 0.2)'
+									color: 'rgba(172, 172, 172, 0.2)'
 								}
 							},
 							x: {
@@ -617,13 +708,13 @@ templ TimeSeriesChart(pathPrefix string) {
 								title: {
 									display: true,
 									text: 'Date',
-									color: '#ffffff'
+									color: '#1F1F1F'
 								},
 								ticks: {
-									color: '#ffffff'
+									color: '#1F1F1F'
 								},
 								grid: {
-									color: 'rgba(255, 255, 255, 0.2)'
+									color: 'rgba(172, 172, 172, 0.2)'
 								}
 							}
 						}
@@ -662,5 +753,6 @@ templ TimeSeriesChart(pathPrefix string) {
 			// Refresh data every 10 seconds
 			setInterval(updateChart, 10000);
 		</script>
+		</div>
 	</div>
 }
